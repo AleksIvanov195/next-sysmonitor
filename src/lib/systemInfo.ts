@@ -1,4 +1,3 @@
-// src/lib/systemInfo.ts
 import si from "systeminformation";
 
 export interface CpuInfo {
