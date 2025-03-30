@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { CpuInfo, MemoryInfo, DiskInfo, SystemLoad } from "@/lib/systemInfo";
 import DonutChart from "./components/UI/graphs/DonutChart";
+import CpuGraph from "./components/entity/graphs/CpuGraph";
 import StatsCard from "./components/entity/cards/StatsCard";
 
 type SystemData = {
@@ -21,11 +22,12 @@ export default function Home() {
 			setData(result);
 		};
 		fetchData();
-		const interval = setInterval(fetchData, 10_000);
+		const interval = setInterval(fetchData, 1000);
 		return () => clearInterval(interval);
 	}, []);
 
 	if (!data) return <div>Loading...</div>;
+	console.log(data);
 	return (
 		<main className="bg-[url('../../public/bgmobile.png')] md:bg-[url('../../public/bgfhd.png')] min-h-screen">
 			<header className="bg-[rgba(33,48,78,0.7)] backdrop-blur-lg border-b border-white/10 w-full p-6 shadow-xl">
@@ -47,11 +49,9 @@ export default function Home() {
 				<div className="flex flex-col justify-center md:flex-row gap-3">
 					<StatsCard title ={"Disk Usage"}
 						bottomText={"2W/35C"}
-						chart = {<DonutChart
-							part1={{ value: 24, name: "Used" }}
-							part2={{ value: 76, name: "Free" }}
-							height={256}
-							width={256}
+						chart = {<CpuGraph
+							info = {data.cpu}
+							load = {data.currentLoad}
 						/>}
 					/>
 					<StatsCard title ={"Disk Usage"}
