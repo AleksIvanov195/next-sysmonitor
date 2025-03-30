@@ -26,12 +26,12 @@ export interface SystemLoad {
 }
 
 export async function getSystemInfo() {
-  const [cpu, memory, disk, currentLoad]: [
+	const [cpu, memory, disk, currentLoad]: [
     CpuInfo,
     MemoryInfo,
     DiskInfo[],
     SystemLoad
   ] = await Promise.all([si.cpu(), si.mem(), si.fsSize(), si.currentLoad()]);
 
-  return { cpu, memory, disk, currentLoad };
+	return { cpu, memory, disk, currentLoad };
 }
