@@ -16,13 +16,28 @@ export default function Home() {
 	const [data, setData] = useState<SystemData | null>(null);
 
 	useEffect(() => {
-		const fetchData = async () => {
+		// Fetch full system info on first load
+		const fetchFullSystemInfo = async () => {
 			const res = await fetch("/api/system-info");
-			const result = await res.json() as SystemData;
+			const result = (await res.json()) as SystemData;
 			setData(result);
 		};
-		fetchData();
-		const interval = setInterval(fetchData, 1000);
+		// Fetch dynamic system info periodically
+		const fetchDynamicSystemInfo = async () => {
+			const res = await fetch("/api/dynamic-system-info");
+			const result = await res.json();
+			setData((prevData) => {
+				if (!prevData) return null;
+				return {
+					...prevData,
+					memory: result.memory,
+					currentLoad: result.currentLoad,
+				};
+			});
+		};
+		fetchFullSystemInfo();
+		const interval = setInterval(fetchDynamicSystemInfo, 10000);
+
 		return () => clearInterval(interval);
 	}, []);
 
@@ -47,12 +62,13 @@ export default function Home() {
 				</div>
 
 				<div className="flex flex-col justify-center md:flex-row gap-3">
-					<StatsCard title ={"Disk Usage"}
+					<StatsCard title ={"CPU Utilisation"}
 						bottomText={"2W/35C"}
-						chart = {<CpuGraph
-							info = {data.cpu}
-							load = {data.currentLoad}
-						/>}
+						chart = {
+							<CpuGraph
+								info = {data.cpu}
+								load = {data.currentLoad}
+							/>}
 					/>
 					<StatsCard title ={"Disk Usage"}
 						bottomText={"2W/35C"}
