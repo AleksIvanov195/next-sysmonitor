@@ -25,7 +25,38 @@ export interface SystemLoad {
   currentLoad: number;
 }
 
+// Cached variables
+let cachedCpu: CpuInfo | null = null;
+let cachedDisk: DiskInfo[] | null = null;
+
 export async function getSystemInfo() {
+
+	if (!cachedCpu) {
+		cachedCpu = await si.cpu();
+	}
+
+	if (!cachedDisk) {
+		cachedDisk = await si.fsSize();
+	}
+
+	const [memory, currentLoad]: [MemoryInfo, SystemLoad] = await Promise.all([
+		si.mem(),
+		si.currentLoad(),
+	]);
+
+	return { cpu: cachedCpu, memory, disk: cachedDisk, currentLoad };
+}
+
+export async function getDynamicSystemInfo() {
+
+	const [memory, currentLoad]: [MemoryInfo, SystemLoad] = await Promise.all([
+		si.mem(),
+		si.currentLoad(),
+	]);
+	return { memory, currentLoad };
+}
+
+export async function getRefreshedSystemInfo() {
 	const [cpu, memory, disk, currentLoad]: [
     CpuInfo,
     MemoryInfo,
