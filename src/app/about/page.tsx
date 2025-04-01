@@ -3,8 +3,7 @@ export default function AboutPage() {
 
 	return (
 		<div>
-			<h1>About Us</h1>
-			<p>This page is server-rendered</p>
+			<h1>About </h1>
 		</div>
 	);
 }
