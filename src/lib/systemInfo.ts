@@ -58,7 +58,7 @@ export async function getDynamicSystemInfo() {
 		si.currentLoad(),
 		si.cpuTemperature(),
 	]);
-	console.log(cpuTemp)
+	console.log(cpuTemp);
 	return { memory, currentLoad, cpuTemp };
 }
 
