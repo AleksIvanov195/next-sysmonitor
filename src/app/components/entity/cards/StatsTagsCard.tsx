@@ -7,9 +7,10 @@ interface StatsTagCardProps {
 	tags?: string[];
 	height?: number;
 	width?: number;
+	onTagClick?: (tag: string) => void;
 }
 
-const StatsTagCard = ({ title, chart, tags, height = 256, width = 256 }: StatsTagCardProps) => {
+const StatsTagCard = ({ title, chart, tags, height = 256, width = 256, onTagClick }: StatsTagCardProps) => {
 
 	return (
 		<Card title = {title}>
@@ -24,7 +25,7 @@ const StatsTagCard = ({ title, chart, tags, height = 256, width = 256 }: StatsTa
 						<span
 							key={tag}
 							className="bg-gray-200 rounded-full p-3 py-1 text-sm font-semibold text-gray-700 cursor-pointer"
-							onClick={() => console.log("MEOW")}
+							onClick={() => onTagClick && onTagClick(tag)}
 						>
 							{tag}
 						</span>

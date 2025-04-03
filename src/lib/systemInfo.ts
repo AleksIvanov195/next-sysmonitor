@@ -25,6 +25,10 @@ export interface SystemLoad {
   currentLoad: number;
 }
 
+export interface CpuTemp {
+  main: number;
+}
+
 // Cached variables
 let cachedCpu: CpuInfo | null = null;
 let cachedDisk: DiskInfo[] | null = null;
@@ -49,11 +53,13 @@ export async function getSystemInfo() {
 
 export async function getDynamicSystemInfo() {
 
-	const [memory, currentLoad]: [MemoryInfo, SystemLoad] = await Promise.all([
+	const [memory, currentLoad, cpuTemp]: [MemoryInfo, SystemLoad, CpuTemp] = await Promise.all([
 		si.mem(),
 		si.currentLoad(),
+		si.cpuTemperature(),
 	]);
-	return { memory, currentLoad };
+	console.log(cpuTemp)
+	return { memory, currentLoad, cpuTemp };
 }
 
 export async function getRefreshedSystemInfo() {

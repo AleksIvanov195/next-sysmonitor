@@ -4,11 +4,11 @@ import DonutChart from "../../UI/graphs/DonutChart";
 const CpuGraph = ({ info, load }: CPUGraphProps) => {
 	const part1 = {
 		value: Math.round(load.currentLoad),
-		name: "Used",
+		name: "Used (%)",
 	};
 	const part2 = {
 		value: 100 - Math.round(load.currentLoad),
-		name: "Used",
+		name: "Free (%)",
 	};
 	return(
 		<DonutChart

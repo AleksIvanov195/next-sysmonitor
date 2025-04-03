@@ -1,20 +1,25 @@
 "use client";
 import { useEffect, useState } from "react";
-import { CpuInfo, MemoryInfo, DiskInfo, SystemLoad } from "@/lib/systemInfo";
+import { CpuInfo, MemoryInfo, DiskInfo, SystemLoad, CpuTemp } from "@/lib/systemInfo";
 import DonutChart from "../UI/graphs/DonutChart";
 import CpuGraph from "../entity/graphs/CpuGraph";
 import MemoryGraph from "../entity/graphs/MemoryGraph";
 import StatsCard from "../entity/cards/StatsCard";
+import StatsTagCard from "../entity/cards/StatsTagsCard";
 
 type SystemData = {
   cpu: CpuInfo;
   memory: MemoryInfo;
   disk: DiskInfo[];
   currentLoad: SystemLoad;
+	cpuTemp: CpuTemp
 };
 
 const StatsView = () => {
+
+	// State ---------------------------------------------
 	const [data, setData] = useState<SystemData | null>(null);
+	const [selectedDisk, setSelectedDisk] = useState<DiskInfo | null>(null);
 
 	useEffect(() => {
 		// Fetch full system info on first load
@@ -22,6 +27,11 @@ const StatsView = () => {
 			const res = await fetch("/api/system-info");
 			const result = (await res.json()) as SystemData;
 			setData(result);
+
+			// Set the first disk as default
+			if (result.disk?.length > 0) {
+				setSelectedDisk(result.disk[0]);
+			}
 		};
 		// Fetch dynamic system info periodically
 		const fetchDynamicSystemInfo = async () => {
@@ -33,6 +43,7 @@ const StatsView = () => {
 					...prevData,
 					memory: result.memory,
 					currentLoad: result.currentLoad,
+					cpuTemp: result.cpuTemp,
 				};
 			});
 		};
@@ -42,19 +53,33 @@ const StatsView = () => {
 		return () => clearInterval(interval);
 	}, []);
 
+	// Handlers ---------------------------------------------
+	const handleDiskSelect = (disk: DiskInfo) => {
+		setSelectedDisk(disk);
+	};
+
+	const handleDiskTagClick = (tag: string) => {
+		if (!data) return;
+		const disk = data.disk.find((d) => d.fs === tag);
+		if (disk) handleDiskSelect(disk);
+	};
+	console.log(data);
+	// View ---------------------------------------------
 	if (!data) return <div>Loading...</div>;
+	const hour = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+	const date = new Date().toLocaleDateString([], { weekday: "long", month: "long", day: "numeric", year: "numeric" });
 	return (
 		<div className="max-w-7xl m-auto p-6 ">
 			<div className="bg-[rgba(255,255,255,0.15)] backdrop-blur-lg rounded-lg shadow p-6 flex flex-col items-center justify-center gap-1 mb-6">
-				<p className="text-5xl font-bold text-white/90">12:46</p>
+				<p className="text-5xl font-bold text-white/90">{hour}</p>
 				<p className="text-xl font-medium text-white/70">
-					<span className="capitalize">March 28th, 2025</span>
+					<span className="capitalize">{date}</span>
 				</p>
 			</div>
 
 			<div className="flex flex-col justify-center md:flex-row gap-3">
 				<StatsCard title ={"CPU Utilisation"}
-					bottomText={"2W/35C"}
+					bottomText={`temp: ${data.cpuTemp.main}`}
 					chart = {
 						<CpuGraph
 							info = {data.cpu}
@@ -62,23 +87,27 @@ const StatsView = () => {
 						/>}
 				/>
 				<StatsCard title ={"Memory Utilisation"}
-					bottomText={"2W/35C"}
 					chart = {
 						<MemoryGraph
 							load = {data.memory}
 						/>}
 				/>
-				<StatsCard title ={"Disk Usage"}
-					
-					chart = {<DonutChart
-						part1={{ value: 24, name: "Used" }}
-						part2={{ value: 76, name: "Free" }}
-						height={256}
-						width={256}
-					/>}
+				<StatsTagCard
+					title={"Disk Usage"}
+					tags={data.disk.map((disk) => disk.fs)}
+					onTagClick={handleDiskTagClick}
+					chart={
+						selectedDisk && (
+							<DonutChart
+								part1={{ value: selectedDisk.size - selectedDisk.used, name: "Free" }}
+								part2={{ value: selectedDisk.used, name: "Used" }}
+								height={256}
+								width={256}
+							/>
+						)
+					}
 				/>
 				<StatsCard title ={"Network Usage"}
-					bottomText={"2W/35C"}
 					chart = {<DonutChart
 						part1={{ value: 24, name: "Used" }}
 						part2={{ value: 76, name: "Free" }}
