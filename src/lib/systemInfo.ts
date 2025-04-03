@@ -43,12 +43,13 @@ export async function getSystemInfo() {
 		cachedDisk = await si.fsSize();
 	}
 
-	const [memory, currentLoad]: [MemoryInfo, SystemLoad] = await Promise.all([
+	const [memory, currentLoad, cpuTemp]: [MemoryInfo, SystemLoad, CpuTemp] = await Promise.all([
 		si.mem(),
 		si.currentLoad(),
+		si.cpuTemperature(),
 	]);
 
-	return { cpu: cachedCpu, memory, disk: cachedDisk, currentLoad };
+	return { cpu: cachedCpu, memory, disk: cachedDisk, currentLoad, cpuTemp };
 }
 
 export async function getDynamicSystemInfo() {
@@ -58,7 +59,6 @@ export async function getDynamicSystemInfo() {
 		si.currentLoad(),
 		si.cpuTemperature(),
 	]);
-	console.log(cpuTemp);
 	return { memory, currentLoad, cpuTemp };
 }
 
