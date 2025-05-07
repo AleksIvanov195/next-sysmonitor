@@ -43,7 +43,6 @@ const DonutChart = ({ part1, part2, width, height }: DonutChartProps) => {
 			emphasis: {
 				label: {
 					show: true,
-					formatter: ({ percent }: { percent: number }) => `${Math.round(percent)}%`,
 					fontSize: 28,
 					fontWeight: "bold",
 					color: "rgba(255,255,255,0.9)",
@@ -71,7 +70,7 @@ const DonutChart = ({ part1, part2, width, height }: DonutChartProps) => {
 	return (
 		<ReactECharts
 			option={option}
-			style={{ height: graphWidth, width: graphHeight }}
+			style={{ height: graphHeight, width: graphWidth }}
 			opts={{ renderer: "svg" }}
 		/>
 	);

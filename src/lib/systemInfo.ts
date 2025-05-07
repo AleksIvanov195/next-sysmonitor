@@ -1,4 +1,5 @@
 import si from "systeminformation";
+import "./getDiskInfo";
 
 export interface CpuInfo {
   manufacturer: string;
@@ -54,12 +55,14 @@ export async function getSystemInfo() {
 
 export async function getDynamicSystemInfo() {
 
+	const diskLayout = await si.diskLayout();
+	const blockDevices = await si.blockDevices();
 	const [memory, currentLoad, cpuTemp]: [MemoryInfo, SystemLoad, CpuTemp] = await Promise.all([
 		si.mem(),
 		si.currentLoad(),
 		si.cpuTemperature(),
 	]);
-	return { memory, currentLoad, cpuTemp };
+	return { memory, currentLoad, cpuTemp, diskLayout, blockDevices };
 }
 
 export async function getRefreshedSystemInfo() {
