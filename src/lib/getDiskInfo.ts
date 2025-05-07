@@ -43,13 +43,14 @@ const getUsedSpace = (disk: Disk) => {
 	}
 	// If children then do a recursive call to getUsedSpace for each child
 	if(disk.children) {
-		disk.children.forEach(child => {
+		console.log("disk child:", disk.children);
+		disk.children.forEach((child : Disk)=> {
 			usedSpace += getUsedSpace(child);
 		});
 	}
 	return usedSpace;
 };
-exec("lsblk -J -o NAME,TYPE,SIZE,FSUSED,FSUSE%", (err, stdout, stderr) => {
+exec("/bin/lsblk -J -o NAME,TYPE,SIZE,FSUSED,FSUSE%", (err, stdout, stderr) => {
 	if (err) {
 		console.error("Error running lsblk:", err);
 		return;
@@ -62,14 +63,22 @@ exec("lsblk -J -o NAME,TYPE,SIZE,FSUSED,FSUSE%", (err, stdout, stderr) => {
 	try {
 		const parsedDisks = JSON.parse(stdout);
 		const disks: Disk[] = [];
-
+		console.log(parsedDisks);
+		console.log(parsedDisks.blockdevices);
+		console.log(parsedDisks.blockdevices.forEach((disk : Disk) => console.log(disk)));
 		// The lsblk -J format outputs blockdevices array
-		parsedDisks.array.forEach((disk : Disk) => {
-			if (disk.type == "disk") {
-				const usedSpace = getUsedSpace(disk);
-				disk.fsused = String(usedSpace);
-				disk["fsuse%"] = (usedSpace * 100 / convertToBytes(disk.size)).toFixed(2) + "%";
-				disks.push(disk);
+		parsedDisks.blockdevices.forEach((disk : Disk) => {
+			if (disk.type === "disk") {
+				try {
+					console.log("Processing disk:", disk);
+					const usedSpace = getUsedSpace(disk);
+					disk.fsused = String(usedSpace);
+					disk["fsuse%"] = (usedSpace * 100 / convertToBytes(disk.size)).toFixed(2) + "%";
+					disks.push(disk);
+				} catch (err) {
+					console.error("Error processing this disk:", disk);
+					console.error(err);
+				}
 			}
 		});
 		console.log("Disk information:", disks);
