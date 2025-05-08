@@ -1,4 +1,9 @@
 import { exec } from "child_process";
+import { promisify } from "util";
+
+// Convert exec to return a Promise
+const execPromise = promisify(exec);
+
 type ByteUnit = "B" | "K" | "M" | "G" | "T";
 
 interface Disk {
@@ -8,6 +13,15 @@ interface Disk {
   fsused?: string;
   "fsuse%"?: string;
   children?: Disk[];
+}
+
+export interface DiskFormatted {
+  name: string;
+  type: string;
+  size: number;
+  fsused?: number;
+  "fsuse%"?: string;
+  children?: DiskFormatted[];
 }
 
 const convertToBytes = (sizeString : string) => {
@@ -50,31 +64,52 @@ const getUsedSpace = (disk: Disk) => {
 	}
 	return usedSpace;
 };
-exec("/bin/lsblk -J -o NAME,TYPE,SIZE,FSUSED,FSUSE%", (err, stdout, stderr) => {
-	if (err) {
-		console.error("Error running lsblk:", err);
-		return;
-	}
-	if (stderr) {
-		console.error("Command stderr:", stderr);
-		return;
+
+// Helper function to convert Disk to DiskFormatted
+const formatDisk = (disk: Disk): DiskFormatted => {
+	const formattedDisk: DiskFormatted = {
+		name: disk.name,
+		type: disk.type,
+		size: convertToBytes(disk.size),
+		"fsuse%": disk["fsuse%"],
+	};
+
+	if (disk.fsused !== undefined) {
+		formattedDisk.fsused = convertToBytes(disk.fsused);
 	}
 
+	if (disk.children) {
+		formattedDisk.children = disk.children.map(child => formatDisk(child));
+	}
+
+	return formattedDisk;
+};
+
+export const getDiskInfoLinux = async (): Promise<DiskFormatted[]> => {
 	try {
+		const { stdout, stderr } = await execPromise("/bin/lsblk -J -o NAME,TYPE,SIZE,FSUSED,FSUSE%");
+
+		if (stderr) {
+			console.error("Command stderr:", stderr);
+			return [];
+		}
+
 		const parsedDisks = JSON.parse(stdout);
-		const disks: Disk[] = [];
+		const disks: DiskFormatted[] = [];
 		console.log(parsedDisks);
 		console.log(parsedDisks.blockdevices);
 		console.log(parsedDisks.blockdevices.forEach((disk : Disk) => console.log(disk)));
+
 		// The lsblk -J format outputs blockdevices array
 		parsedDisks.blockdevices.forEach((disk : Disk) => {
 			if (disk.type === "disk") {
 				try {
 					console.log("Processing disk:", disk);
 					const usedSpace = getUsedSpace(disk);
-					disk.fsused = String(usedSpace);
-					disk["fsuse%"] = (usedSpace * 100 / convertToBytes(disk.size)).toFixed(2) + "%";
-					disks.push(disk);
+					const formattedDisk = formatDisk(disk);
+					formattedDisk.fsused = usedSpace;
+					formattedDisk["fsuse%"] = (usedSpace * 100 / formattedDisk.size).toFixed(2) + "%";
+					disks.push(formattedDisk);
 				} catch (err) {
 					console.error("Error processing this disk:", disk);
 					console.error(err);
@@ -83,7 +118,8 @@ exec("/bin/lsblk -J -o NAME,TYPE,SIZE,FSUSED,FSUSE%", (err, stdout, stderr) => {
 		});
 		console.log("Disk information:", disks);
 		return disks;
-	} catch (parseError) {
-		console.error("Error parsing JSON output:", parseError);
+	} catch (error) {
+		console.error("Error getting disk information:", error);
+		return [];
 	}
-});
+};

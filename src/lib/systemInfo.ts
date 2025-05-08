@@ -1,5 +1,7 @@
 import si from "systeminformation";
-import "./getDiskInfo";
+import { getDiskInfoLinux, DiskFormatted } from "./getDiskInfoLinux";
+import { getDiskInfoWindows } from "./getDiskInfoWindows";
+import * as os from "os";
 
 export interface CpuInfo {
   manufacturer: string;
@@ -14,13 +16,6 @@ export interface MemoryInfo {
   free: number;
 }
 
-export interface DiskInfo {
-  fs: string;
-  size: number;
-  used: number;
-  mount: string;
-}
-
 export interface SystemLoad {
   avgLoad: number;
   currentLoad: number;
@@ -30,9 +25,20 @@ export interface CpuTemp {
   main: number;
 }
 
-// Cached variables
+// Determine the platform
+const isWindows = os.platform() === "win32";
+
+// Cached variables - these are expensive to compute
 let cachedCpu: CpuInfo | null = null;
-let cachedDisk: DiskInfo[] | null = null;
+let cachedDisk: DiskFormatted[] | null = null;
+
+const getDiskInfoForCurrentPlatform = async () =>{
+	if (isWindows) {
+		return await getDiskInfoWindows();
+	} else {
+		return await getDiskInfoLinux();
+	}
+};
 
 export async function getSystemInfo() {
 
@@ -41,7 +47,7 @@ export async function getSystemInfo() {
 	}
 
 	if (!cachedDisk) {
-		cachedDisk = await si.fsSize();
+		cachedDisk = await getDiskInfoForCurrentPlatform();
 	}
 
 	const [memory, currentLoad, cpuTemp]: [MemoryInfo, SystemLoad, CpuTemp] = await Promise.all([
@@ -55,23 +61,22 @@ export async function getSystemInfo() {
 
 export async function getDynamicSystemInfo() {
 
-	const diskLayout = await si.diskLayout();
-	const blockDevices = await si.blockDevices();
 	const [memory, currentLoad, cpuTemp]: [MemoryInfo, SystemLoad, CpuTemp] = await Promise.all([
 		si.mem(),
 		si.currentLoad(),
 		si.cpuTemperature(),
 	]);
-	return { memory, currentLoad, cpuTemp, diskLayout, blockDevices };
+	return { memory, currentLoad, cpuTemp };
 }
 
-export async function getRefreshedSystemInfo() {
+export async function getFreshSystemInfo() {
 	const [cpu, memory, disk, currentLoad]: [
     CpuInfo,
     MemoryInfo,
-    DiskInfo[],
+    DiskFormatted[],
     SystemLoad
-  ] = await Promise.all([si.cpu(), si.mem(), si.fsSize(), si.currentLoad()]);
-
+  ] = await Promise.all([si.cpu(), si.mem(), getDiskInfoForCurrentPlatform(), si.currentLoad()]);
+	cachedCpu = cpu;
+	cachedDisk = disk;
 	return { cpu, memory, disk, currentLoad };
 }
