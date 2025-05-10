@@ -19,7 +19,7 @@ export interface DiskFormatted {
   name: string;
   type: string;
   size: number;
-  fsused?: number;
+  fsused: number;
   "fsuse%"?: string;
   children?: DiskFormatted[];
 }

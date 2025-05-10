@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { getRefreshedSystemInfo } from "@/lib/systemInfo";
+import { getFreshSystemInfo } from "@/lib/systemInfo";
 
 
 export async function GET() {
-	const systemInfo = await getRefreshedSystemInfo();
+	const systemInfo = await getFreshSystemInfo();
 	return NextResponse.json(systemInfo);
 }

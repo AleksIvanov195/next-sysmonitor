@@ -80,3 +80,4 @@ export async function getFreshSystemInfo() {
 	cachedDisk = disk;
 	return { cpu, memory, disk, currentLoad };
 }
+

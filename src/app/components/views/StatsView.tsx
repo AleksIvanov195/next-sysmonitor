@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { CpuInfo, MemoryInfo, DiskInfo, SystemLoad, CpuTemp } from "@/lib/systemInfo";
+import { CpuInfo, MemoryInfo, SystemLoad, CpuTemp } from "@/lib/systemInfo";
+import { DiskFormatted } from "@/lib/getDiskInfoLinux";
 import DonutChart from "../UI/graphs/DonutChart";
 import CpuGraph from "../entity/graphs/CpuGraph";
 import MemoryGraph from "../entity/graphs/MemoryGraph";
@@ -10,7 +11,7 @@ import StatsTagCard from "../entity/cards/StatsTagsCard";
 type SystemData = {
   cpu: CpuInfo;
   memory: MemoryInfo;
-  disk: DiskInfo[];
+  disk: DiskFormatted[];
   currentLoad: SystemLoad;
 	cpuTemp: CpuTemp
 };
@@ -19,7 +20,7 @@ const StatsView = () => {
 
 	// State ---------------------------------------------
 	const [data, setData] = useState<SystemData | null>(null);
-	const [selectedDisk, setSelectedDisk] = useState<DiskInfo | null>(null);
+	const [selectedDisk, setSelectedDisk] = useState<DiskFormatted | null>(null);
 
 	useEffect(() => {
 		// Fetch full system info on first load
@@ -54,13 +55,13 @@ const StatsView = () => {
 	}, []);
 
 	// Handlers ---------------------------------------------
-	const handleDiskSelect = (disk: DiskInfo) => {
+	const handleDiskSelect = (disk: DiskFormatted) => {
 		setSelectedDisk(disk);
 	};
 
 	const handleDiskTagClick = (tag: string) => {
 		if (!data) return;
-		const disk = data.disk.find((d) => d.fs === tag);
+		const disk = data.disk.find((d) => d.name === tag);
 		if (disk) handleDiskSelect(disk);
 	};
 	console.log(data);
@@ -94,13 +95,13 @@ const StatsView = () => {
 				/>
 				<StatsTagCard
 					title={"Disk Usage"}
-					tags={data.disk.map((disk) => disk.fs)}
+					tags={data.disk.map((disk) => disk.name)}
 					onTagClick={handleDiskTagClick}
 					chart={
 						selectedDisk && (
 							<DonutChart
-								part1={{ value: selectedDisk.size - selectedDisk.used, name: "Free" }}
-								part2={{ value: selectedDisk.used, name: "Used" }}
+								part1={{ value: selectedDisk.fsused, name: "Used" }}
+								part2={{ value: selectedDisk.size - selectedDisk.fsused, name: "Free" }}
 								height={256}
 								width={256}
 							/>
