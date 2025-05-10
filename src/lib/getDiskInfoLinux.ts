@@ -71,6 +71,7 @@ const formatDisk = (disk: Disk): DiskFormatted => {
 		name: disk.name,
 		type: disk.type,
 		size: convertToBytes(disk.size),
+		fsused: disk.fsused ? convertToBytes(disk.fsused) : 0,
 		"fsuse%": disk["fsuse%"],
 	};
 
