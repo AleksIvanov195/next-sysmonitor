@@ -2,18 +2,22 @@
 import { useEffect, useState } from "react";
 import { CpuInfo, MemoryInfo, SystemLoad, CpuTemp } from "@/lib/systemInfo";
 import { DiskFormatted } from "@/lib/getDiskInfoLinux";
+import { BasicNetworkStats } from "@/lib/getNetworkStats";
 import DonutChart from "../UI/graphs/DonutChart";
 import CpuGraph from "../entity/graphs/CpuGraph";
 import MemoryGraph from "../entity/graphs/MemoryGraph";
 import StatsCard from "../entity/cards/StatsCard";
 import StatsTagCard from "../entity/cards/StatsTagsCard";
+import Gauge from "../UI/graphs/Gauge";
 
 type SystemData = {
   cpu: CpuInfo;
   memory: MemoryInfo;
   disk: DiskFormatted[];
   currentLoad: SystemLoad;
-	cpuTemp: CpuTemp
+	cpuTemp: CpuTemp;
+	network: BasicNetworkStats;
+
 };
 
 const StatsView = () => {
@@ -21,6 +25,7 @@ const StatsView = () => {
 	// State ---------------------------------------------
 	const [data, setData] = useState<SystemData | null>(null);
 	const [selectedDisk, setSelectedDisk] = useState<DiskFormatted | null>(null);
+	const [selectedNetworkStat, setSelectedNetworkStat] = useState("Download");
 
 	useEffect(() => {
 		// Fetch full system info on first load
@@ -45,6 +50,7 @@ const StatsView = () => {
 					memory: result.memory,
 					currentLoad: result.currentLoad,
 					cpuTemp: result.cpuTemp,
+					network: result.network,
 				};
 			});
 		};
@@ -63,6 +69,12 @@ const StatsView = () => {
 		if (!data) return;
 		const disk = data.disk.find((d) => d.name === tag);
 		if (disk) handleDiskSelect(disk);
+	};
+
+	const handleNetworkTagClick = (tag: string) => {
+		if (tag === "Download" || tag === "Upload") {
+			setSelectedNetworkStat(tag);
+		}
 	};
 	console.log(data);
 	// View ---------------------------------------------
@@ -97,27 +109,35 @@ const StatsView = () => {
 					title={"Disk Usage"}
 					tags={data.disk.map((disk) => disk.name)}
 					onTagClick={handleDiskTagClick}
+					selectedTag={selectedDisk?.name}
 					chart={
 						selectedDisk && (
 							<DonutChart
 								part1={{ value: selectedDisk.fsused, name: "Used" }}
 								part2={{ value: selectedDisk.size - selectedDisk.fsused, name: "Free" }}
-								height={256}
-								width={256}
+								height={228}
+								width={228}
 							/>
 						)
 					}
 				/>
-				<StatsCard title ={"Network Usage"}
-					chart = {<DonutChart
-						part1={{ value: 24, name: "Used" }}
-						part2={{ value: 76, name: "Free" }}
-						height={256}
-						width={256}
-					/>}
+				<StatsTagCard title ={"Network"}
+					tags={["Download", "Upload"]}
+					onTagClick={handleNetworkTagClick}
+					selectedTag={selectedNetworkStat}
+					chart = {
+						<Gauge
+							name="Mbps"
+							value={parseFloat((
+								selectedNetworkStat === "Download"
+									? (data.network?.downloadSpeed * 8) / 1000000
+									: (data.network?.uploadSpeed * 8) / 1000000
+							).toFixed(2))}
+							height={228}
+							width={228}
+						/>}
 				/>
 			</div>
-
 		</div>
 	);
 };

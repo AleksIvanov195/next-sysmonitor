@@ -15,8 +15,8 @@ const CpuGraph = ({ info, load }: CPUGraphProps) => {
 		<DonutChart
 			part1={part1}
 			part2={part2}
-			height={256}
-			width={256}/>
+			height={228}
+			width={228}/>
 	);
 };
 

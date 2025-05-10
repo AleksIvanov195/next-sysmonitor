@@ -8,9 +8,10 @@ interface StatsTagCardProps {
 	height?: number;
 	width?: number;
 	onTagClick?: (tag: string) => void;
+	selectedTag?: string;
 }
 
-const StatsTagCard = ({ title, chart, tags, height = 256, width = 256, onTagClick }: StatsTagCardProps) => {
+const StatsTagCard = ({ title, chart, tags, height = 256, width = 256, onTagClick, selectedTag }: StatsTagCardProps) => {
 
 	return (
 		<Card title = {title}>
@@ -24,7 +25,11 @@ const StatsTagCard = ({ title, chart, tags, height = 256, width = 256, onTagClic
 					{tags && tags.map(tag => (
 						<span
 							key={tag}
-							className="bg-gray-200 rounded-full p-3 py-1 text-sm font-semibold text-gray-700 cursor-pointer"
+							className={`rounded-full p-3 py-1 text-sm font-semibold cursor-pointer
+								${tag === selectedTag
+							? "bg-blue-500 text-white"
+							: "bg-gray-200 text-gray-700"
+						}`}
 							onClick={() => onTagClick && onTagClick(tag)}
 						>
 							{tag}

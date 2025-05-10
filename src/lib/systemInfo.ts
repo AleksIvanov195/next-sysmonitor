@@ -1,7 +1,13 @@
 import si from "systeminformation";
 import { getDiskInfoLinux, DiskFormatted } from "./getDiskInfoLinux";
 import { getDiskInfoWindows } from "./getDiskInfoWindows";
+import { getNetworkSpeeds, BasicNetworkStats } from "./getNetworkStats";
 import * as os from "os";
+
+// Periodically fetch network speeds to populate the history
+setInterval(() => {
+	getNetworkSpeeds();
+}, 10000);
 
 export interface CpuInfo {
   manufacturer: string;
@@ -50,23 +56,25 @@ export async function getSystemInfo() {
 		cachedDisk = await getDiskInfoForCurrentPlatform();
 	}
 
-	const [memory, currentLoad, cpuTemp]: [MemoryInfo, SystemLoad, CpuTemp] = await Promise.all([
+	const [memory, currentLoad, cpuTemp, network]: [MemoryInfo, SystemLoad, CpuTemp, BasicNetworkStats] = await Promise.all([
 		si.mem(),
 		si.currentLoad(),
 		si.cpuTemperature(),
+		getNetworkSpeeds(),
 	]);
 
-	return { cpu: cachedCpu, memory, disk: cachedDisk, currentLoad, cpuTemp };
+	return { cpu: cachedCpu, memory, disk: cachedDisk, currentLoad, cpuTemp, network };
 }
 
 export async function getDynamicSystemInfo() {
 
-	const [memory, currentLoad, cpuTemp]: [MemoryInfo, SystemLoad, CpuTemp] = await Promise.all([
+	const [memory, currentLoad, cpuTemp, network]: [MemoryInfo, SystemLoad, CpuTemp, BasicNetworkStats] = await Promise.all([
 		si.mem(),
 		si.currentLoad(),
 		si.cpuTemperature(),
+		getNetworkSpeeds(),
 	]);
-	return { memory, currentLoad, cpuTemp };
+	return { memory, currentLoad, cpuTemp, network };
 }
 
 export async function getFreshSystemInfo() {
