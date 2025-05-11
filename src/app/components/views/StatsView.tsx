@@ -9,6 +9,7 @@ import MemoryGraph from "../entity/graphs/MemoryGraph";
 import StatsCard from "../entity/cards/StatsCard";
 import StatsTagCard from "../entity/cards/StatsTagsCard";
 import Gauge from "../UI/graphs/Gauge";
+import LineChart from "../UI/graphs/LineChart";
 
 type SystemData = {
   cpu: CpuInfo;
@@ -17,7 +18,7 @@ type SystemData = {
   currentLoad: SystemLoad;
 	cpuTemp: CpuTemp;
 	network: BasicNetworkStats;
-
+	networkHistory: BasicNetworkStats[];
 };
 
 const StatsView = () => {
@@ -51,6 +52,7 @@ const StatsView = () => {
 					currentLoad: result.currentLoad,
 					cpuTemp: result.cpuTemp,
 					network: result.network,
+					networkHistory: result.networkHistory,
 				};
 			});
 		};
@@ -90,7 +92,7 @@ const StatsView = () => {
 				</p>
 			</div>
 
-			<div className="flex flex-col justify-center md:flex-row gap-3">
+			<div className="flex flex-col justify-center md:flex-row gap-3 mb-6">
 				<StatsCard title ={"CPU Utilisation"}
 					bottomText={`temp: ${data.cpuTemp.main}`}
 					chart = {
@@ -138,6 +140,35 @@ const StatsView = () => {
 						/>}
 				/>
 			</div>
+			<StatsTagCard title ={""}
+				tags={["CPU", "Memory", "Network"]}
+				onTagClick={handleNetworkTagClick}
+				selectedTag={selectedNetworkStat}
+				chart = {
+					<LineChart
+						title="Network Speed History"
+						series={[
+							{
+								name: "Download",
+								data: data.networkHistory.map(point => ({
+									timestamp: point.timestamp,
+									value: parseFloat(((point.downloadSpeed * 8) / 1000000).toFixed(2)),
+								})),
+								color: "#60a5fa",
+							},
+							{
+								name: "Upload",
+								data: data.networkHistory.map(point => ({
+									timestamp: point.timestamp,
+									value: parseFloat(((point.uploadSpeed * 8) / 1000000).toFixed(2)),
+								})),
+								color: "#ff4560",
+							},
+						]}
+						yAxisName="Speed (Mbps)"
+						height={256}
+					/>}
+			/>
 		</div>
 	);
 };

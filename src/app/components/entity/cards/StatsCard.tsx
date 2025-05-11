@@ -5,18 +5,14 @@ interface StatsCardProps {
 	title: string;
 	chart: ReactNode;
 	bottomText?: string;
-	height?: number;
-	width?: number;
 }
 
-const StatsCard = ({ title, chart, bottomText, height = 256, width = 256 }: StatsCardProps) => {
+const StatsCard = ({ title, chart, bottomText }: StatsCardProps) => {
 
 	return (
 		<Card title = {title}>
 			<div className="flex flex-1 items-center justify-center p-2">
-				<div className={`h-[${height}px] w-[${width}px]`}>
-					{chart}
-				</div>
+				{chart}
 			</div>
 			{bottomText && (
 				<h3 className="text-lg font-medium text-white/90 text-center">{bottomText}</h3>
