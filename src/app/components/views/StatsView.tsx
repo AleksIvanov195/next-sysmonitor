@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { CpuInfo, MemoryInfo, SystemLoad, CpuTemp } from "@/lib/systemInfo";
-import { DiskFormatted } from "@/lib/getDiskInfoLinux";
-import { BasicNetworkStats } from "@/lib/getNetworkStats";
+import { DiskFormatted } from "@/lib/utils/getDiskInfoLinux";
+import { BasicNetworkStats } from "@/lib/NetworkInfo";
 import DonutChart from "../UI/graphs/DonutChart";
 import CpuGraph from "../entity/graphs/CpuGraph";
 import MemoryGraph from "../entity/graphs/MemoryGraph";

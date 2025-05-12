@@ -1,91 +1,75 @@
 import si from "systeminformation";
-import { getDiskInfoLinux, DiskFormatted } from "./getDiskInfoLinux";
-import { getDiskInfoWindows } from "./getDiskInfoWindows";
-import { getNetworkSpeeds, BasicNetworkStats } from "./getNetworkStats";
-import * as os from "os";
+import { MemoryInfo, SystemLoad, CpuTemp, CpuInfo, CpuMetric } from "./types/system";
+import { BasicNetworkStats } from "./types/network";
+import { getDiskInfo, refreshDiskInfo } from "./DiskInfo";
+import { getNetworkHistory, getNetworkSpeeds, startNetworkMonitoring } from "./NetworkInfo";
+import { getCpuHistory, getCpuInfo, getCpuMetrics, startCpuMonitoring } from "./CpuInfo";
 
-// Periodically fetch network speeds to populate the history
-setInterval(() => {
-	getNetworkSpeeds();
-}, 10000);
-
-export interface CpuInfo {
-  manufacturer: string;
-  brand: string;
-  speed: number;
-  cores: number;
-}
-
-export interface MemoryInfo {
-  total: number;
-  used: number;
-  free: number;
-}
-
-export interface SystemLoad {
-  avgLoad: number;
-  currentLoad: number;
-}
-
-export interface CpuTemp {
-  main: number;
-}
-
-// Determine the platform
-const isWindows = os.platform() === "win32";
-
-// Cached variables - these are expensive to compute
-let cachedCpu: CpuInfo | null = null;
-let cachedDisk: DiskFormatted[] | null = null;
-
-const getDiskInfoForCurrentPlatform = async () =>{
-	if (isWindows) {
-		return await getDiskInfoWindows();
-	} else {
-		return await getDiskInfoLinux();
-	}
-};
+startNetworkMonitoring();
 
 export async function getSystemInfo() {
-
-	if (!cachedCpu) {
-		cachedCpu = await si.cpu();
-	}
-
-	if (!cachedDisk) {
-		cachedDisk = await getDiskInfoForCurrentPlatform();
-	}
-
-	const [memory, currentLoad, cpuTemp, network]: [MemoryInfo, SystemLoad, CpuTemp, BasicNetworkStats] = await Promise.all([
+	const [memory, cpu, cpuMetrics, cpuHistory, network, networkHistory]:
+	[MemoryInfo, CpuInfo, CpuMetric, CpuMetric[], BasicNetworkStats, BasicNetworkStats[]] = await Promise.all([
 		si.mem(),
-		si.currentLoad(),
-		si.cpuTemperature(),
+		getCpuInfo(),
+		getCpuMetrics(),
+		getCpuHistory(),
 		getNetworkSpeeds(),
+		getNetworkHistory(),
 	]);
 
-	return { cpu: cachedCpu, memory, disk: cachedDisk, currentLoad, cpuTemp, network };
+	const disk = await getDiskInfo();
+	  return {
+		cpu,
+		memory,
+		disk,
+		currentLoad: cpuMetrics.load,
+		cpuTemp: cpuMetrics.temp,
+		cpuHistory,
+		network,
+		networkHistory,
+	};
 }
 
 export async function getDynamicSystemInfo() {
 
-	const [memory, currentLoad, cpuTemp, network]: [MemoryInfo, SystemLoad, CpuTemp, BasicNetworkStats] = await Promise.all([
+	const [memory, cpuMetrics, cpuHistory, network, networkHistory]:
+	[MemoryInfo, CpuMetric, CpuMetric[], BasicNetworkStats, BasicNetworkStats[]] = await Promise.all([
+		si.mem(),
+		getCpuMetrics(),
+		getCpuHistory(),
+		getNetworkSpeeds(),
+		getNetworkHistory(),
+	]);
+	return {
+		memory,
+		currentLoad: cpuMetrics.load,
+		cpuTemp: cpuMetrics.temp,
+		cpuHistory,
+		network,
+		networkHistory,
+	};
+}
+export async function getFreshSystemInfo() {
+	const [cpu, memory, currentLoad, cpuTemp, network, networkHistory]: [CpuInfo, MemoryInfo, SystemLoad, CpuTemp, BasicNetworkStats, BasicNetworkStats[]] = await Promise.all([
+		si.cpu(),
 		si.mem(),
 		si.currentLoad(),
 		si.cpuTemperature(),
 		getNetworkSpeeds(),
+		getNetworkHistory(),
 	]);
-	return { memory, currentLoad, cpuTemp, network };
+
+	const disk = await refreshDiskInfo();
+
+	return { cpu, memory, disk, currentLoad, cpuTemp, network, networkHistory };
 }
 
-export async function getFreshSystemInfo() {
-	const [cpu, memory, disk, currentLoad]: [
-    CpuInfo,
-    MemoryInfo,
-    DiskFormatted[],
-    SystemLoad
-  ] = await Promise.all([si.cpu(), si.mem(), getDiskInfoForCurrentPlatform(), si.currentLoad()]);
-	cachedCpu = cpu;
-	cachedDisk = disk;
-	return { cpu, memory, disk, currentLoad };
+export async function getHistoricData() {
+	const [networkHistory]: [BasicNetworkStats[]] = await Promise.all([
+		getNetworkHistory(),
+	]);
+
+	return { networkHistory };
 }
 

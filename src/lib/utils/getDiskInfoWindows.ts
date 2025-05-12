@@ -1,7 +1,7 @@
 import si from "systeminformation";
-import { DiskFormatted } from "./getDiskInfoLinux";
+import { DiskFormatted } from "../types/disk";
 
-interface DiskInfo {
+interface WindowsDiskInfo {
   fs: string;
 	type: string;
   size: number;
@@ -13,7 +13,7 @@ export const getDiskInfoWindows = async () => {
 	const disks = await si.fsSize();
 	const formattedDisksInfo : DiskFormatted[] = [];
 
-	disks.forEach((disk : DiskInfo) => {
+	disks.forEach((disk : WindowsDiskInfo) => {
 		const formattedInfo : DiskFormatted = {
 			name: disk.fs,
 			type: disk.type,
