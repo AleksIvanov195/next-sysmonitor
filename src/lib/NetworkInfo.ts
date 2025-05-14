@@ -1,5 +1,6 @@
 import si from "systeminformation";
 import { BasicNetworkStats } from "./types/network";
+import { Response } from "./types/system";
 
 /*
 	RxBytes show the number of bytes recived by the network interface
@@ -20,7 +21,7 @@ let isRequestInProgress = false;
 
 let currentMonitoringInterval = 20000;
 
-export const fetchNetworkStats = async () => {
+export const fetchNetworkStats = async () : Promise<BasicNetworkStats> => {
 	// If a request is already in progress, wait for it to complete
 	  if (isRequestInProgress) {
 		await new Promise(resolve => {
@@ -51,7 +52,6 @@ export const fetchNetworkStats = async () => {
 			totalDownloadSpeed += stat.rx_sec; // Total download speed (bytes per second)
 			totalUploadSpeed += stat.tx_sec;   // Total upload speed (bytes per second)
 		}
-
 		const dataPoint = {
 			downloadSpeed: totalDownloadSpeed,
 			uploadSpeed: totalUploadSpeed,
@@ -67,11 +67,11 @@ export const fetchNetworkStats = async () => {
 	}
 };
 
-export const getNetworkSpeeds = async () => {
+export const getNetworkSpeeds = async () : Promise<BasicNetworkStats> => {
 	return fetchNetworkStats();
 };
 
-const recordNetworkSpeeds = async () => {
+const recordNetworkSpeeds = async () : Promise<void>=> {
 	try {
 		// Calculate minimum interval as 20% of the monitoring interval
 		// with bounds of 1-5 seconds to ensure reasonable values
@@ -96,24 +96,42 @@ export const getNetworkHistory = () => {
 	return [...networkHistory];
 };
 
-export const startNetworkMonitoring = (interval = 20000) => {
-	if (networkTimer) {
-		console.warn("Network monitoring already running.");
-		return;
-	}
-	currentMonitoringInterval = interval;
-	console.log("Starting network monitoring...");
-	// Collect first data point immediately
-	recordNetworkSpeeds();
+export const startNetworkMonitoring = async (interval = 20000) : Promise<Response> => {
+	try {
+		if (networkTimer) {
+			throw new Error("Network monitoring already running");
+		}
+		currentMonitoringInterval = interval;
+		console.log("Starting network monitoring...");
+		// Collect first data point immediately
+		recordNetworkSpeeds();
+		networkTimer = setInterval(recordNetworkSpeeds, interval);
 
-	networkTimer = setInterval(recordNetworkSpeeds, interval);
+		return {
+			success: true,
+			message: "Network monitoring started successfully",
+		};
+	  } catch (error) {
+		console.error("Failed to start network monitoring:", error);
+		throw error;
+	}
 };
 
-export const stopNetworkMonitoring = () => {
-	if (networkTimer) {
+export const stopNetworkMonitoring = async () : Promise<Response> => {
+	try {
+		if (!networkTimer) {
+			throw new Error("Network monitoring is not running");
+		}
 		clearInterval(networkTimer);
 		networkTimer = null;
 		console.log("Stopped network monitoring.");
+		return {
+			success: true,
+			message: "Network monitoring stopped successfully",
+		};
+	} catch (error) {
+		console.error("Failed to stop network monitoring:", error);
+		throw error;
 	}
 };
 

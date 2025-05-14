@@ -1,4 +1,4 @@
-import { CpuInfo, SystemLoad, MemoryInfo } from "@/lib/systemInfo";
+import { CpuInfo, SystemLoad, MemoryInfo } from "@/lib/types/system";
 
 export interface CPUGraphProps {
 	info: CpuInfo;

@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-import { CpuInfo, MemoryInfo, SystemLoad, CpuTemp } from "@/lib/systemInfo";
-import { DiskFormatted } from "@/lib/utils/getDiskInfoLinux";
-import { BasicNetworkStats } from "@/lib/NetworkInfo";
+import { CpuInfo, MemoryInfo, SystemLoad, CpuTemp } from "@/lib/types/system";
+import { DiskFormatted } from "@/lib/types/disk";
+import { BasicNetworkStats } from "@/lib/types/network";
 import DonutChart from "../UI/graphs/DonutChart";
 import CpuGraph from "../entity/graphs/CpuGraph";
 import MemoryGraph from "../entity/graphs/MemoryGraph";
@@ -18,15 +18,20 @@ type SystemData = {
   currentLoad: SystemLoad;
 	cpuTemp: CpuTemp;
 	network: BasicNetworkStats;
-	networkHistory: BasicNetworkStats[];
 };
 
-const StatsView = () => {
+interface HistoricData {
+  networkHistory: BasicNetworkStats[];
+}
 
+
+const StatsView = () => {
 	// State ---------------------------------------------
 	const [data, setData] = useState<SystemData | null>(null);
 	const [selectedDisk, setSelectedDisk] = useState<DiskFormatted | null>(null);
-	const [selectedNetworkStat, setSelectedNetworkStat] = useState("Download");
+	const [selectedNetworkStat, setSelectedNetworkStat] = useState<string>("Download");
+	const [isHistoryEnabled, setIsHistoryEnabled] = useState<boolean>(false);
+	const [historicData, setHistoricData] = useState<HistoricData | null>(null);
 
 	useEffect(() => {
 		// Fetch full system info on first load
@@ -52,7 +57,6 @@ const StatsView = () => {
 					currentLoad: result.currentLoad,
 					cpuTemp: result.cpuTemp,
 					network: result.network,
-					networkHistory: result.networkHistory,
 				};
 			});
 		};
@@ -78,7 +82,12 @@ const StatsView = () => {
 			setSelectedNetworkStat(tag);
 		}
 	};
-	console.log(data);
+	const handleEnableHistory = async () => {
+		const res = await fetch("/api/historic-system-info");
+		const result = (await res.json()) as HistoricData;
+		setHistoricData(result);
+		setIsHistoryEnabled(true);
+	};
 	// View ---------------------------------------------
 	if (!data) return <div>Loading...</div>;
 	const hour = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -140,35 +149,46 @@ const StatsView = () => {
 						/>}
 				/>
 			</div>
-			<StatsTagCard title ={""}
-				tags={["CPU", "Memory", "Network"]}
-				onTagClick={handleNetworkTagClick}
-				selectedTag={selectedNetworkStat}
-				chart = {
-					<LineChart
-						title="Network Speed History"
-						series={[
-							{
-								name: "Download",
-								data: data.networkHistory.map(point => ({
-									timestamp: point.timestamp,
-									value: parseFloat(((point.downloadSpeed * 8) / 1000000).toFixed(2)),
-								})),
-								color: "#60a5fa",
-							},
-							{
-								name: "Upload",
-								data: data.networkHistory.map(point => ({
-									timestamp: point.timestamp,
-									value: parseFloat(((point.uploadSpeed * 8) / 1000000).toFixed(2)),
-								})),
-								color: "#ff4560",
-							},
-						]}
-						yAxisName="Speed (Mbps)"
-						height={256}
-					/>}
-			/>
+			{
+				!isHistoryEnabled ? (
+					<button
+						className="bg-blue-500 text-white font-bold py-2 px-4 rounded mb-6"
+						onClick={handleEnableHistory}
+					>
+						Enable Network History
+					</button>
+				) : historicData &&
+					<StatsTagCard title ={""}
+						tags={["CPU", "Memory", "Network"]}
+						onTagClick={handleNetworkTagClick}
+						selectedTag={selectedNetworkStat}
+						chart = {
+							<LineChart
+								title="Network Speed History"
+								series={[
+									{
+										name: "Download",
+										data: historicData.networkHistory.map(point => ({
+											timestamp: point.timestamp,
+											value: parseFloat(((point.downloadSpeed * 8) / 1000000).toFixed(2)),
+										})),
+										color: "#60a5fa",
+									},
+									{
+										name: "Upload",
+										data: historicData.networkHistory.map(point => ({
+											timestamp: point.timestamp,
+											value: parseFloat(((point.uploadSpeed * 8) / 1000000).toFixed(2)),
+										})),
+										color: "#ff4560",
+									},
+								]}
+								yAxisName="Speed (Mbps)"
+								height={256}
+							/>}
+					/>
+			}
+
 		</div>
 	);
 };
