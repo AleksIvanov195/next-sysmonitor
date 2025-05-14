@@ -23,13 +23,10 @@ export interface CpuTemp {
 export interface CpuMetric {
   load: SystemLoad;
   temp: CpuTemp;
+	timestamp: number;
 }
 
 export interface Response {
   success: boolean;
   message: string;
-}
-
-export interface CpuMetricHistory extends CpuMetric {
-  timestamp: number;
 }

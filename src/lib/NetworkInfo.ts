@@ -67,11 +67,11 @@ export const fetchNetworkStats = async () : Promise<BasicNetworkStats> => {
 	}
 };
 
-export const getNetworkSpeeds = async () : Promise<BasicNetworkStats> => {
+export const getNetworkStats = async () : Promise<BasicNetworkStats> => {
 	return fetchNetworkStats();
 };
 
-const recordNetworkSpeeds = async () : Promise<void>=> {
+const logNetworkStats = async () : Promise<void>=> {
 	try {
 		// Calculate minimum interval as 20% of the monitoring interval
 		// with bounds of 1-5 seconds to ensure reasonable values
@@ -104,8 +104,8 @@ export const startNetworkMonitoring = async (interval = 20000) : Promise<Respons
 		currentMonitoringInterval = interval;
 		console.log("Starting network monitoring...");
 		// Collect first data point immediately
-		recordNetworkSpeeds();
-		networkTimer = setInterval(recordNetworkSpeeds, interval);
+		logNetworkStats();
+		networkTimer = setInterval(logNetworkStats, interval);
 
 		return {
 			success: true,

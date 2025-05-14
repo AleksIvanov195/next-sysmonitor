@@ -1,5 +1,5 @@
 import { startNetworkMonitoring, stopNetworkMonitoring } from "./NetworkInfo";
-import { startCpuMonitoring } from "./CpuInfo";
+import { startCpuMonitoring, stopCpuMonitoring } from "./CpuInfo";
 import { Response } from "./types/system";
 
 
@@ -25,7 +25,7 @@ export const startMonitoring = async (interval = 20000) : Promise<Response> => {
 export const stopMonitoring = async () : Promise<Response> => {
 	try {
 		stopNetworkMonitoring();
-		// Todo: Implement stopCpuMonitoring
+		stopCpuMonitoring();
 		return {
 			success: true,
 			message: "Monitoring services stopped successfully",

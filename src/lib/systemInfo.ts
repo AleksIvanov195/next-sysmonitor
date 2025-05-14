@@ -2,7 +2,7 @@ import si from "systeminformation";
 import { MemoryInfo, SystemLoad, CpuTemp, CpuInfo, CpuMetric } from "./types/system";
 import { BasicNetworkStats } from "./types/network";
 import { getDiskInfo, refreshDiskInfo } from "./DiskInfo";
-import { getNetworkHistory, getNetworkSpeeds } from "./NetworkInfo";
+import { getNetworkHistory, getNetworkStats } from "./NetworkInfo";
 import { getCpuHistory, getCpuInfo, getCpuMetrics } from "./CpuInfo";
 
 export async function getSystemInfo() {
@@ -12,7 +12,7 @@ export async function getSystemInfo() {
 		getCpuInfo(),
 		getCpuMetrics(),
 		getCpuHistory(),
-		getNetworkSpeeds(),
+		getNetworkStats(),
 		getNetworkHistory(),
 	]);
 
@@ -36,7 +36,7 @@ export async function getDynamicSystemInfo() {
 		si.mem(),
 		getCpuMetrics(),
 		getCpuHistory(),
-		getNetworkSpeeds(),
+		getNetworkStats(),
 		getNetworkHistory(),
 	]);
 	return {
@@ -54,7 +54,7 @@ export async function getFreshSystemInfo() {
 		si.mem(),
 		si.currentLoad(),
 		si.cpuTemperature(),
-		getNetworkSpeeds(),
+		getNetworkStats(),
 		getNetworkHistory(),
 	]);
 
