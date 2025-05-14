@@ -135,4 +135,4 @@ export const stopNetworkMonitoring = async () : Promise<Response> => {
 	}
 };
 
-export const isMonitoring = (): boolean => !!networkTimer;
+export const isNetworkMonitoring = (): boolean => !!networkTimer;

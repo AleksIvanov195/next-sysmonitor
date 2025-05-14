@@ -130,4 +130,4 @@ export const stopCpuMonitoring = async (): Promise<Response> => {
 	}
 };
 
-export const isMonitoring = (): boolean => !!cpuTimer;
+export const isCpuMonitoring = (): boolean => !!cpuTimer;

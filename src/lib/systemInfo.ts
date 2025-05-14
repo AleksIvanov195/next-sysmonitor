@@ -64,8 +64,9 @@ export async function getFreshSystemInfo() {
 }
 
 export async function getHistoricData() {
-	const [networkHistory]: [BasicNetworkStats[]] = await Promise.all([
+	const [networkHistory]: [BasicNetworkStats[], CpuMetric[]] = await Promise.all([
 		getNetworkHistory(),
+		getCpuHistory(),
 	]);
 
 	return { networkHistory };

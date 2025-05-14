@@ -1,5 +1,5 @@
-import { startNetworkMonitoring, stopNetworkMonitoring } from "./NetworkInfo";
-import { startCpuMonitoring, stopCpuMonitoring } from "./CpuInfo";
+import { startNetworkMonitoring, stopNetworkMonitoring, isNetworkMonitoring } from "./NetworkInfo";
+import { startCpuMonitoring, stopCpuMonitoring, isCpuMonitoring } from "./CpuInfo";
 import { Response } from "./types/system";
 
 
@@ -37,5 +37,23 @@ export const stopMonitoring = async () : Promise<Response> => {
 			message: `Failed to stop monitoring: ${error instanceof Error ? error.message : "Unknown error"}`,
 
 		};
+	}
+};
+
+export const isMonitoring = async (): Promise<Response> => {
+	try {
+		if (isNetworkMonitoring() && isCpuMonitoring()) {
+			return {
+				success: true,
+				message: "All monitoring services are running",
+			};
+		} else {
+			return {
+				success: false,
+				message: "Some or all monitoring services are not running",
+			};
+		}
+	} catch (error) {
+		throw new Error(`Failed to check monitoring status: ${error instanceof Error ? error.message : "Unknown error"}`);
 	}
 };
