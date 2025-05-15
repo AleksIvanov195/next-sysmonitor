@@ -17,7 +17,6 @@ const callFetch = async (endpoint: string, method: string, data?: unknown) => {
 		if (response.status === 204) return { isSuccess: true, result: null };
 
 		const result = await response.json().catch(() => null);
-		console.log(response)
 		if (response.ok) {
 			return { isSuccess: true, result };
 		} else {

@@ -42,7 +42,7 @@ const HistoryView = ({}) => {
 							name: "Download",
 							data: historicData.networkHistory.map(point => ({
 								timestamp: point.timestamp,
-								value: parseFloat(((point.downloadSpeed * 8) / 1000000).toFixed(2)),
+								value: parseFloat(((point.downloadSpeed * 8) / 1000000).toFixed(3)),
 							})),
 							color: "#60a5fa",
 						},
@@ -50,7 +50,7 @@ const HistoryView = ({}) => {
 							name: "Upload",
 							data: historicData.networkHistory.map(point => ({
 								timestamp: point.timestamp,
-								value: parseFloat(((point.uploadSpeed * 8) / 1000000).toFixed(2)),
+								value: parseFloat(((point.uploadSpeed * 8) / 1000000).toFixed(3)),
 							})),
 							color: "#ff4560",
 						},
