@@ -9,7 +9,7 @@ import MemoryGraph from "../entity/graphs/MemoryGraph";
 import StatsCard from "../entity/cards/StatsCard";
 import StatsTagCard from "../entity/cards/StatsTagsCard";
 import Gauge from "../UI/graphs/Gauge";
-import LineChart from "../UI/graphs/LineChart";
+import HistoryView from "./HistoryView";
 
 type SystemData = {
   cpu: CpuInfo;
@@ -20,18 +20,12 @@ type SystemData = {
 	network: BasicNetworkStats;
 };
 
-interface HistoricData {
-  networkHistory: BasicNetworkStats[];
-}
-
-
 const StatsView = () => {
 	// State ---------------------------------------------
 	const [data, setData] = useState<SystemData | null>(null);
 	const [selectedDisk, setSelectedDisk] = useState<DiskFormatted | null>(null);
 	const [selectedNetworkStat, setSelectedNetworkStat] = useState<string>("Download");
 	const [isHistoryEnabled, setIsHistoryEnabled] = useState<boolean>(false);
-	const [historicData, setHistoricData] = useState<HistoricData | null>(null);
 
 	useEffect(() => {
 		// Fetch full system info on first load
@@ -83,24 +77,14 @@ const StatsView = () => {
 		}
 	};
 	const handleEnableHistory = async () => {
-		const res = await fetch("/api/historic-system-info");
-		const result = (await res.json()) as HistoricData;
-		setHistoricData(result);
 		setIsHistoryEnabled(true);
 	};
+
 	// View ---------------------------------------------
 	if (!data) return <div>Loading...</div>;
-	const hour = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-	const date = new Date().toLocaleDateString([], { weekday: "long", month: "long", day: "numeric", year: "numeric" });
-	return (
-		<div className="max-w-7xl m-auto p-6 ">
-			<div className="bg-[rgba(255,255,255,0.15)] backdrop-blur-lg rounded-lg shadow p-6 flex flex-col items-center justify-center gap-1 mb-6">
-				<p className="text-5xl font-bold text-white/90">{hour}</p>
-				<p className="text-xl font-medium text-white/70">
-					<span className="capitalize">{date}</span>
-				</p>
-			</div>
 
+	return (
+		<>
 			<div className="flex flex-col justify-center md:flex-row gap-3 mb-6">
 				<StatsCard title ={"CPU Utilisation"}
 					bottomText={`temp: ${data.cpuTemp.main}`}
@@ -155,41 +139,13 @@ const StatsView = () => {
 						className="bg-blue-500 text-white font-bold py-2 px-4 rounded mb-6"
 						onClick={handleEnableHistory}
 					>
-						Enable Network History
+						Fetch Network History
 					</button>
-				) : historicData &&
-					<StatsTagCard title ={""}
-						tags={["CPU", "Memory", "Network"]}
-						onTagClick={handleNetworkTagClick}
-						selectedTag={selectedNetworkStat}
-						chart = {
-							<LineChart
-								title="Network Speed History"
-								series={[
-									{
-										name: "Download",
-										data: historicData.networkHistory.map(point => ({
-											timestamp: point.timestamp,
-											value: parseFloat(((point.downloadSpeed * 8) / 1000000).toFixed(2)),
-										})),
-										color: "#60a5fa",
-									},
-									{
-										name: "Upload",
-										data: historicData.networkHistory.map(point => ({
-											timestamp: point.timestamp,
-											value: parseFloat(((point.uploadSpeed * 8) / 1000000).toFixed(2)),
-										})),
-										color: "#ff4560",
-									},
-								]}
-								yAxisName="Speed (Mbps)"
-								height={256}
-							/>}
-					/>
-			}
+				) :
+					<HistoryView />
 
-		</div>
+			}
+		</>
 	);
 };
 
