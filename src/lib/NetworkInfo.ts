@@ -58,6 +58,7 @@ export const fetchNetworkStats = async () : Promise<BasicNetworkStats> => {
 			timestamp: Date.now(),
 		};
 		lastRequestTime = Date.now();
+		console.log("NETWORK STATS", networkHistory);
 		return dataPoint;
 	} catch (error) {
 		console.error("Error getting network speeds:", error);

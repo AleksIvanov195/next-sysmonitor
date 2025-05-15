@@ -2,6 +2,9 @@ import { startNetworkMonitoring, stopNetworkMonitoring, isNetworkMonitoring } fr
 import { startCpuMonitoring, stopCpuMonitoring, isCpuMonitoring } from "./CpuInfo";
 import { Response } from "./types/system";
 
+interface MonitoringResponse extends Response {
+	isMonitoring: boolean;
+}
 
 export const startMonitoring = async (interval = 20000) : Promise<Response> => {
 	try {
@@ -40,17 +43,19 @@ export const stopMonitoring = async () : Promise<Response> => {
 	}
 };
 
-export const isMonitoring = async (): Promise<Response> => {
+export const isMonitoring = async (): Promise<MonitoringResponse> => {
 	try {
 		if (isNetworkMonitoring() && isCpuMonitoring()) {
 			return {
 				success: true,
 				message: "All monitoring services are running",
+				isMonitoring: true,
 			};
 		} else {
 			return {
-				success: false,
+				success: true,
 				message: "Some or all monitoring services are not running",
+				isMonitoring: false,
 			};
 		}
 	} catch (error) {

@@ -8,8 +8,6 @@ export async function GET() {
 		if (result.success) {
 			return NextResponse.json(result, { status: 200 });
 		}
-
-		return NextResponse.json(result, { status: 400 });
 	} catch (error) {
 		console.error("Error checking monitoring status:", error);
 		return NextResponse.json(

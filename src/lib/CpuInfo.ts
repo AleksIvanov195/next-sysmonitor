@@ -50,7 +50,7 @@ export const fetchCpuMetrics = async (): Promise<CpuMetric> => {
 			load: currentLoad,
 			temp: cpuTemp,
 		};
-
+		console.log("CPU STATS", cpuHistory);
 		lastRequestTime = Date.now();
 		return data;
 	} catch (error) {
