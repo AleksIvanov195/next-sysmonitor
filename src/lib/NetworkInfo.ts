@@ -21,6 +21,8 @@ let isRequestInProgress = false;
 
 let currentMonitoringInterval = 20000;
 
+let maxNetworkHistoryPoints = 0;
+
 export const fetchNetworkStats = async () : Promise<BasicNetworkStats> => {
 	// If a request is already in progress, wait for it to complete
 	  if (isRequestInProgress) {
@@ -73,6 +75,7 @@ export const getNetworkStats = async () : Promise<BasicNetworkStats> => {
 };
 
 const logNetworkStats = async () : Promise<void>=> {
+	console.log("NETWORK POINTS", maxNetworkHistoryPoints);
 	try {
 		// Calculate minimum interval as 20% of the monitoring interval
 		// with bounds of 1-5 seconds to ensure reasonable values
@@ -134,6 +137,10 @@ export const stopNetworkMonitoring = async () : Promise<Response> => {
 		console.error("Failed to stop network monitoring:", error);
 		throw error;
 	}
+};
+
+export const setMaxNetworkHistoryPoints = (points: number) : void => {
+	maxNetworkHistoryPoints = points;
 };
 
 export const isNetworkMonitoring = (): boolean => !!networkTimer;

@@ -10,6 +10,7 @@ let isFirstRun = true;
 let lastRequestTime = 0;
 let isRequestInProgress = false;
 let currentMonitoringInterval = 10000;
+let maxCpuHistoryPoints = 0;
 
 export const getCpuInfo = async () => {
 	if (!cpuInfo) {
@@ -70,6 +71,7 @@ export const getCpuMetrics = async (): Promise<CpuMetric> => {
 };
 
 const logCpuMetrics = async (): Promise<void> => {
+	console.log("CPU POINTS", maxCpuHistoryPoints);
 	try {
 		const MIN_INTERVAL = Math.min(5000, Math.max(1000, Math.round(currentMonitoringInterval * 0.2)));
 
@@ -128,6 +130,10 @@ export const stopCpuMonitoring = async (): Promise<Response> => {
 		console.error("Failed to stop CPU monitoring:", error);
 		throw error;
 	}
+};
+
+export const setMaxCpuHistoryPoints = (points: number) : void => {
+	maxCpuHistoryPoints = points;
 };
 
 export const isCpuMonitoring = (): boolean => !!cpuTimer;

@@ -18,6 +18,7 @@ export const startMonitoring = async (interval = 20000) : Promise<Response> => {
 		};
 	} catch (error) {
 		console.error("Failed to start monitoring:", error);
+		stopMonitoring();
 		return {
 			success: false,
 			message: `Failed to start monitoring: ${error instanceof Error ? error.message : "Unknown error"}`,
