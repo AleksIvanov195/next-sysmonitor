@@ -43,6 +43,11 @@ export const stopMonitoring = async () : Promise<Response> => {
 	}
 };
 
+export const restartMonitoring = async (interval = 20000): Promise<Response> => {
+	await stopMonitoring();
+	return startMonitoring(interval);
+};
+
 export const isMonitoring = async (): Promise<MonitoringResponse> => {
 	try {
 		if (isNetworkMonitoring() && isCpuMonitoring()) {

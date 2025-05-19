@@ -9,6 +9,7 @@ export interface MemoryInfo {
   total: number;
   used: number;
   free: number;
+	available: number;
 }
 
 export interface SystemLoad {

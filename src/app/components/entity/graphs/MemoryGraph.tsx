@@ -10,7 +10,7 @@ const MemoryGraph = ({ load }: MemoryGraphProps) => {
 		name: "Used (GB)",
 	};
 	const part2 = {
-		value: parseFloat(bytesToGB(load.free)),
+		value: parseFloat(bytesToGB(load.available)),
 		name: "Free (GB)",
 	};
 	return (
