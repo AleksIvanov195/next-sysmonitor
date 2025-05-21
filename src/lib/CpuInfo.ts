@@ -1,16 +1,18 @@
 import si from "systeminformation";
 import { CpuInfo, CpuTemp, SystemLoad, Response } from "./types/system";
 import { CpuMetric } from "./types/system";
+import { readHistory, writeHistory } from "./history";
 
 let cpuInfo: CpuInfo | null = null;
 let cpuTimer: NodeJS.Timeout | null = null;
-const cpuHistory: CpuMetric[] = [];
 
 let isFirstRun = true;
 let lastRequestTime = 0;
 let isRequestInProgress = false;
-let currentMonitoringInterval = 10000;
+let currentMonitoringInterval = 20000;
 let maxCpuHistoryPoints = 0;
+const fileName = "cpuHistory";
+
 
 export const getCpuInfo = async () => {
 	if (!cpuInfo) {
@@ -51,7 +53,6 @@ export const fetchCpuMetrics = async (): Promise<CpuMetric> => {
 			load: currentLoad,
 			temp: cpuTemp,
 		};
-		console.log("CPU STATS", cpuHistory);
 		lastRequestTime = Date.now();
 		return data;
 	} catch (error) {
@@ -73,24 +74,28 @@ export const getCpuMetrics = async (): Promise<CpuMetric> => {
 const logCpuMetrics = async (): Promise<void> => {
 	console.log("CPU POINTS", maxCpuHistoryPoints);
 	try {
-		const MIN_INTERVAL = Math.min(5000, Math.max(1000, Math.round(currentMonitoringInterval * 0.2)));
+		const minInterval = Math.min(5000, Math.max(1000, Math.round(currentMonitoringInterval * 0.2)));
 
 		const timeSinceLastRequest = Date.now() - lastRequestTime;
-		if (timeSinceLastRequest < MIN_INTERVAL) {
+		if (timeSinceLastRequest < minInterval) {
 			await new Promise(resolve =>
-				setTimeout(resolve, MIN_INTERVAL - timeSinceLastRequest),
+				setTimeout(resolve, minInterval - timeSinceLastRequest),
 			);
 		}
 
 		const dataPoint = await fetchCpuMetrics();
-		cpuHistory.push(dataPoint);
+		const fileHistory = await readHistory<CpuMetric>(fileName);
+		const updatedHistory = [...fileHistory, dataPoint];
+
+		await writeHistory(fileName, updatedHistory, maxCpuHistoryPoints);
 	} catch (error) {
 		console.error("Error recording CPU metrics:", error);
 	}
 };
 
-export const getCpuHistory = () => {
-	return [...cpuHistory];
+export const getCpuHistory = async () => {
+	const fileHistory = await readHistory<CpuMetric>(fileName);
+	return fileHistory;
 };
 
 export const startCpuMonitoring = async (interval = 10000): Promise<Response> => {

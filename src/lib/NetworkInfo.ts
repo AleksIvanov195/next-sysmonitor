@@ -1,6 +1,7 @@
 import si from "systeminformation";
 import { BasicNetworkStats } from "./types/network";
 import { Response } from "./types/system";
+import { readHistory, writeHistory } from "./history";
 
 /*
 	RxBytes show the number of bytes recived by the network interface
@@ -10,18 +11,12 @@ import { Response } from "./types/system";
 */
 let networkTimer: NodeJS.Timeout | null = null;
 
-// In-memory history
-const networkHistory: BasicNetworkStats[] = [];
-
 let isFirstRun = true;
-
 let lastRequestTime = 0;
-
 let isRequestInProgress = false;
-
 let currentMonitoringInterval = 20000;
-
 let maxNetworkHistoryPoints = 0;
+const fileName = "networkHistory";
 
 export const fetchNetworkStats = async () : Promise<BasicNetworkStats> => {
 	// If a request is already in progress, wait for it to complete
@@ -60,7 +55,6 @@ export const fetchNetworkStats = async () : Promise<BasicNetworkStats> => {
 			timestamp: Date.now(),
 		};
 		lastRequestTime = Date.now();
-		console.log("NETWORK STATS", networkHistory);
 		return dataPoint;
 	} catch (error) {
 		console.error("Error getting network speeds:", error);
@@ -79,25 +73,29 @@ const logNetworkStats = async () : Promise<void>=> {
 	try {
 		// Calculate minimum interval as 20% of the monitoring interval
 		// with bounds of 1-5 seconds to ensure reasonable values
-		const MIN_INTERVAL = Math.min(5000, Math.max(1000, Math.round(currentMonitoringInterval * 0.2)));
+		const minInterval = Math.min(5000, Math.max(1000, Math.round(currentMonitoringInterval * 0.2)));
 
 		// If an on-demand request was made very recently, wait a bit
 		const timeSinceLastRequest = Date.now() - lastRequestTime;
-		if (timeSinceLastRequest < MIN_INTERVAL) {
+		if (timeSinceLastRequest < minInterval) {
 			await new Promise(resolve =>
-				setTimeout(resolve, MIN_INTERVAL - timeSinceLastRequest),
+				setTimeout(resolve, minInterval - timeSinceLastRequest),
 			);
 		}
-
 		const dataPoint = await fetchNetworkStats();
-		networkHistory.push(dataPoint);
+
+		const fileHistory = await readHistory<BasicNetworkStats>(fileName);
+		const updatedHistory = [...fileHistory, dataPoint];
+
+		await writeHistory(fileName, updatedHistory, maxNetworkHistoryPoints);
 	} catch (error) {
 		console.error("Error recording network speeds:", error);
 	}
 };
 
-export const getNetworkHistory = () => {
-	return [...networkHistory];
+export const getNetworkHistory = async () => {
+	const fileHistory = await readHistory<BasicNetworkStats>(fileName);
+	return fileHistory;
 };
 
 export const startNetworkMonitoring = async (interval = 20000) : Promise<Response> => {

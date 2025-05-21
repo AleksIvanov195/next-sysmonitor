@@ -1,5 +1,6 @@
 export interface AppSettings {
   monitoringEnabled: boolean;
+	showHistoryOnLoad: boolean,
 	monitoringInterval: number;
 	cpuHistoryPoints: number;
   networkHistoryPoints: number;
@@ -8,6 +9,7 @@ export interface AppSettings {
 
 const defaultSettings: AppSettings = {
 	monitoringEnabled: false,
+	showHistoryOnLoad: false,
 	monitoringInterval: 60000,
 	cpuHistoryPoints: 1440,
 	networkHistoryPoints: 1440,
@@ -17,24 +19,24 @@ const defaultSettings: AppSettings = {
 export const readSettings = async (): Promise<AppSettings> => {
 	const fs = await import("fs");
 	const path = await import("path");
-	const SETTINGS_PATH = path.resolve(process.cwd(), "data", "settings.json");
+	const settingsPath = path.resolve(process.cwd(), "data", "settings.json");
 
-	if (!fs.existsSync(SETTINGS_PATH)) {
+	if (!fs.existsSync(settingsPath)) {
 		// Ensure the directory exists
-		fs.mkdirSync(path.dirname(SETTINGS_PATH), { recursive: true });
-		fs.writeFileSync(SETTINGS_PATH, JSON.stringify(defaultSettings, null, 2));
+		fs.mkdirSync(path.dirname(settingsPath), { recursive: true });
+		fs.writeFileSync(settingsPath, JSON.stringify(defaultSettings, null, 2));
 		return defaultSettings;
 	}
-	const raw = fs.readFileSync(SETTINGS_PATH, "utf-8");
+	const raw = fs.readFileSync(settingsPath, "utf-8");
 	return JSON.parse(raw) as AppSettings;
 };
 
 export const writeSettings = async (settings: AppSettings): Promise<void> => {
 	const fs = await import("fs");
 	const path = await import("path");
-	const SETTINGS_PATH = path.resolve(process.cwd(), "data", "settings.json");
+	const settingsPath = path.resolve(process.cwd(), "data", "settings.json");
 
 	// Ensure the directory exists
-	fs.mkdirSync(path.dirname(SETTINGS_PATH), { recursive: true });
-	fs.writeFileSync(SETTINGS_PATH, JSON.stringify(settings, null, 2));
+	fs.mkdirSync(path.dirname(settingsPath), { recursive: true });
+	fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2));
 };
