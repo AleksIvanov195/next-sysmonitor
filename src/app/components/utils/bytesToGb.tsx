@@ -1,0 +1,1 @@
+export const bytesToGB = (bytes: number) => (bytes / (1024 ** 3)).toFixed(2);

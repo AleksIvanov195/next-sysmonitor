@@ -1,7 +1,6 @@
 import { MemoryGraphProps } from "./Graphs.types";
+import { bytesToGB } from "../../utils/bytesToGb";
 import DonutChart from "../../UI/graphs/DonutChart";
-
-const bytesToGB = (bytes: number) => (bytes / (1024 ** 3)).toFixed(2);
 
 const MemoryGraph = ({ load }: MemoryGraphProps) => {
 

@@ -3,13 +3,13 @@ import { useEffect, useState } from "react";
 import { CpuInfo, MemoryInfo, SystemLoad, CpuTemp } from "@/lib/types/system";
 import { DiskFormatted } from "@/lib/types/disk";
 import { BasicNetworkStats } from "@/lib/types/network";
-import DonutChart from "../UI/graphs/DonutChart";
 import CpuGraph from "../entity/graphs/CpuGraph";
 import MemoryGraph from "../entity/graphs/MemoryGraph";
 import StatsCard from "../entity/cards/StatsCard";
 import StatsTagCard from "../entity/cards/StatsTagsCard";
 import Gauge from "../UI/graphs/Gauge";
 import HistoryView from "./HistoryView";
+import DiskGraph from "../entity/graphs/DiskGraphs";
 
 type SystemData = {
   cpu: CpuInfo;
@@ -107,12 +107,7 @@ const StatsView = () => {
 					selectedTag={selectedDisk?.name}
 					chart={
 						selectedDisk && (
-							<DonutChart
-								part1={{ value: selectedDisk.fsused, name: "Used" }}
-								part2={{ value: selectedDisk.size - selectedDisk.fsused, name: "Free" }}
-								height={228}
-								width={228}
-							/>
+							<DiskGraph disk={selectedDisk} />
 						)
 					}
 				/>
