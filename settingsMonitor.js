@@ -1,5 +1,5 @@
 import fs from "fs";
-import { readSettings } from "./src/lib/settings.ts";
+import { readSettings, writeSettings } from "./src/lib/settings.ts";
 import { applySettings } from "./src/lib/applySettings.ts";
 
 let lastSettings = await readSettings();
@@ -21,6 +21,18 @@ fs.watch("./data/settings.json", async (eventType) => {
 				}
 			} catch (error) {
 				console.error("Error applying settings:", error);
+				console.log("Reverting to previous settings...");
+				try {
+					// Revert the file to last known good settings
+					await writeSettings(lastSettings);
+					// Re-apply the last good settings to ensure system state is correct
+					await applySettings(lastSettings);
+					console.log("Successfully reverted to previous settings");
+
+				} catch (revertError) {
+					console.error("Failed to revert settings:", revertError);
+					console.error("System may need a restart. Please check the settings file manually.");
+				}
 			}
 		}, 100);
 	}
