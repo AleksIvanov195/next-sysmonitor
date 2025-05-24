@@ -4,6 +4,7 @@ import useLoad from "../../apiutils/useLoad";
 import API from "../../apiutils/API";
 import { useRef, useEffect } from "react";
 import { AppSettings } from "@/lib/settings";
+import Switcher from "../../UI/Switch";
 
 interface SettingsDrawerProps {
   isOpen: boolean;
@@ -82,6 +83,10 @@ const SettingsDrawer = ({ isOpen, onClose }: SettingsDrawerProps) => {
 		if (isNaN(newValue) || newValue < 1 || newValue === settings?.networkHistoryPoints) return;
 
 		await updateSetting({ networkHistoryPoints: newValue });
+	};
+	const handleUpdateShowHistoryOnLoad = async (checked: boolean) => {
+		if (isLoading) return;
+		updateSetting({ showHistoryOnLoad: checked });
 	};
 	// View ---------------------------------------------
 	const monitoring = settings?.monitoringEnabled;
@@ -195,6 +200,12 @@ const SettingsDrawer = ({ isOpen, onClose }: SettingsDrawerProps) => {
 						</p>
 					)}
 				</div>
+				<Switcher
+					checked={!!settings?.showHistoryOnLoad}
+					onChange={checked => handleUpdateShowHistoryOnLoad(checked)}
+					disabled={isLoading}
+					label="Enable Fetch History on Load"
+				/>
 				<hr className="border-t border-white" />
 				<button
 					onClick={onClose}
