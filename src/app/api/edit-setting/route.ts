@@ -1,14 +1,11 @@
 import { NextResponse } from "next/server";
 import { readSettings, writeSettings, AppSettings } from "@/lib/settings";
-import { applySettings } from "@/lib/applySettings";
 
 export async function PUT(req: Request) {
 	try {
 		const updates = await req.json() as Partial<AppSettings>;
 		const current = await readSettings();
 		const newSettings = { ...current, ...updates };
-
-		await applySettings(newSettings);
 		await writeSettings(newSettings);
 
 		return NextResponse.json(

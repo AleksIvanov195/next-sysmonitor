@@ -9,8 +9,8 @@ interface MonitoringResponse extends Response {
 export const startMonitoring = async (interval = 20000) : Promise<Response> => {
 	try {
 		// Start both monitoring services
-		startNetworkMonitoring(interval);
-		startCpuMonitoring(interval);
+		await startNetworkMonitoring(interval);
+		await startCpuMonitoring(interval);
 
 		return {
 			success: true,
@@ -28,8 +28,8 @@ export const startMonitoring = async (interval = 20000) : Promise<Response> => {
 
 export const stopMonitoring = async () : Promise<Response> => {
 	try {
-		stopNetworkMonitoring();
-		stopCpuMonitoring();
+		await stopNetworkMonitoring();
+		await stopCpuMonitoring();
 		return {
 			success: true,
 			message: "Monitoring services stopped successfully",

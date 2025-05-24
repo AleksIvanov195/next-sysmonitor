@@ -34,6 +34,6 @@ export async function applySettings(settings: AppSettings): Promise<void> {
 		// else: already off, do nothing
 	}
 
-	// Finally cache the settings for faster access next time.
+	// Finally cache the settings
 	currentSettings = settings;
 }

@@ -11,6 +11,7 @@ let lastRequestTime = 0;
 let isRequestInProgress = false;
 let currentMonitoringInterval = 20000;
 let maxCpuHistoryPoints = 0;
+let isMonitoringActive = false;
 const fileName = "cpuHistory";
 
 
@@ -34,7 +35,6 @@ export const fetchCpuMetrics = async (): Promise<CpuMetric> => {
 			checkLock();
 		});
 	}
-
 	isRequestInProgress = true;
 	try {
 		if (isFirstRun) {
@@ -108,6 +108,7 @@ export const startCpuMonitoring = async (interval = 10000): Promise<Response> =>
 		// Collect first data point immediately
 		logCpuMetrics();
 		cpuTimer = setInterval(logCpuMetrics, interval);
+		isMonitoringActive = true;
 
 		return {
 			success: true,
@@ -126,6 +127,7 @@ export const stopCpuMonitoring = async (): Promise<Response> => {
 		}
 		clearInterval(cpuTimer);
 		cpuTimer = null;
+		isMonitoringActive = false;
 		console.log("Stopped CPU monitoring.");
 		return {
 			success: true,
@@ -141,4 +143,4 @@ export const setMaxCpuHistoryPoints = (points: number) : void => {
 	maxCpuHistoryPoints = points;
 };
 
-export const isCpuMonitoring = (): boolean => !!cpuTimer;
+export const isCpuMonitoring = (): boolean => isMonitoringActive;

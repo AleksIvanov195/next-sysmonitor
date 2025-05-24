@@ -16,6 +16,7 @@ let lastRequestTime = 0;
 let isRequestInProgress = false;
 let currentMonitoringInterval = 20000;
 let maxNetworkHistoryPoints = 0;
+let isMonitoringActive = false;
 const fileName = "networkHistory";
 
 export const fetchNetworkStats = async () : Promise<BasicNetworkStats> => {
@@ -108,6 +109,7 @@ export const startNetworkMonitoring = async (interval = 20000) : Promise<Respons
 		// Collect first data point immediately
 		logNetworkStats();
 		networkTimer = setInterval(logNetworkStats, interval);
+		isMonitoringActive = true;
 
 		return {
 			success: true,
@@ -126,6 +128,7 @@ export const stopNetworkMonitoring = async () : Promise<Response> => {
 		}
 		clearInterval(networkTimer);
 		networkTimer = null;
+		isMonitoringActive = true;
 		console.log("Stopped network monitoring.");
 		return {
 			success: true,
@@ -141,4 +144,4 @@ export const setMaxNetworkHistoryPoints = (points: number) : void => {
 	maxNetworkHistoryPoints = points;
 };
 
-export const isNetworkMonitoring = (): boolean => !!networkTimer;
+export const isNetworkMonitoring = (): boolean => isMonitoringActive;
