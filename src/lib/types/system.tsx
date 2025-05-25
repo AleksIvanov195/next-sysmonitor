@@ -15,6 +15,7 @@ export interface MemoryInfo {
 export interface SystemLoad {
   avgLoad: number;
   currentLoad: number;
+	cpus?: unknown;
 }
 
 export interface CpuTemp {

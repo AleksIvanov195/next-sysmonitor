@@ -43,10 +43,14 @@ export const fetchCpuMetrics = async (): Promise<CpuMetric> => {
 			await new Promise(resolve => setTimeout(resolve, 1000));
 		}
 
-		const [currentLoad, cpuTemp]: [SystemLoad, CpuTemp] = await Promise.all([
+		const [currentLoadRaw, cpuTemp]: [SystemLoad, CpuTemp] = await Promise.all([
 			si.currentLoad(),
 			si.cpuTemperature(),
 		]);
+
+		// Remove the 'cpus' property from currentLoadRaw
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const { cpus, ...currentLoad } = currentLoadRaw;
 
 		const data = {
 			timestamp: Date.now(),
@@ -84,17 +88,14 @@ const logCpuMetrics = async (): Promise<void> => {
 		}
 
 		const dataPoint = await fetchCpuMetrics();
-		const fileHistory = await readHistory<CpuMetric>(fileName);
-		const updatedHistory = [...fileHistory, dataPoint];
-
-		await writeHistory(fileName, updatedHistory, maxCpuHistoryPoints);
+		writeHistory(fileName, dataPoint, maxCpuHistoryPoints);
 	} catch (error) {
 		console.error("Error recording CPU metrics:", error);
 	}
 };
 
 export const getCpuHistory = async () => {
-	const fileHistory = await readHistory<CpuMetric>(fileName);
+	const fileHistory = readHistory<CpuMetric>(fileName);
 	return fileHistory;
 };
 

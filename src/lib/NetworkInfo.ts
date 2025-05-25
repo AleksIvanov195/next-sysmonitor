@@ -85,17 +85,14 @@ const logNetworkStats = async () : Promise<void>=> {
 		}
 		const dataPoint = await fetchNetworkStats();
 
-		const fileHistory = await readHistory<BasicNetworkStats>(fileName);
-		const updatedHistory = [...fileHistory, dataPoint];
-
-		await writeHistory(fileName, updatedHistory, maxNetworkHistoryPoints);
+		writeHistory(fileName, dataPoint, maxNetworkHistoryPoints);
 	} catch (error) {
 		console.error("Error recording network speeds:", error);
 	}
 };
 
 export const getNetworkHistory = async () => {
-	const fileHistory = await readHistory<BasicNetworkStats>(fileName);
+	const fileHistory = readHistory<BasicNetworkStats>(fileName);
 	return fileHistory;
 };
 
