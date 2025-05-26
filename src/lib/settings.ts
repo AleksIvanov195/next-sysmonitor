@@ -1,6 +1,6 @@
 export interface AppSettings {
   monitoringEnabled: boolean;
-	showHistoryOnLoad: boolean,
+	autoShowHistory: boolean,
 	monitoringInterval: number;
 	cpuHistoryPoints: number;
   networkHistoryPoints: number;
@@ -9,7 +9,7 @@ export interface AppSettings {
 
 const defaultSettings: AppSettings = {
 	monitoringEnabled: false,
-	showHistoryOnLoad: false,
+	autoShowHistory: false,
 	monitoringInterval: 60000,
 	cpuHistoryPoints: 1440,
 	networkHistoryPoints: 1440,

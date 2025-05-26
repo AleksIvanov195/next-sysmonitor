@@ -1,10 +1,8 @@
 "use client";
 import Drawer from "@/app/components/UI/Drawer";
-import useLoad from "../../apiutils/useLoad";
-import API from "../../apiutils/API";
 import { useRef, useEffect } from "react";
-import { AppSettings } from "@/lib/settings";
 import Switcher from "../../UI/Switch";
+import { useSettings } from "../../SettingsProvider";
 
 interface SettingsDrawerProps {
   isOpen: boolean;
@@ -28,11 +26,9 @@ function formatDuration(ms: number | undefined): string {
 }
 
 const SettingsDrawer = ({ isOpen, onClose }: SettingsDrawerProps) => {
+	// Initialisation ---------------------------------------------
+	const { settings, settingsMessage, isLoading, updateSetting } = useSettings();
 	// State ---------------------------------------------
-	const [settings, , loadingMessage, isLoading, reloadSettings] = useLoad<AppSettings>(
-		"/api/settings",
-		isOpen,
-	);
 	const intervalRef = useRef<HTMLInputElement>(null);
 	const cpuRef = useRef<HTMLInputElement>(null);
 	const networkRef = useRef<HTMLInputElement>(null);
@@ -45,11 +41,6 @@ const SettingsDrawer = ({ isOpen, onClose }: SettingsDrawerProps) => {
 		}
 	}, [settings, isOpen]);
 	// Handlers ---------------------------------------------
-	const updateSetting = async (settingData: Record<string, unknown>) => {
-		if (isLoading) return;
-		await API.put("/api/edit-setting", settingData);
-		reloadSettings();
-	};
 	const handleToggleMonitoring = async (enabled: boolean) => {
 		if (isLoading) return;
 		await updateSetting({ monitoringEnabled: enabled });
@@ -86,7 +77,7 @@ const SettingsDrawer = ({ isOpen, onClose }: SettingsDrawerProps) => {
 	};
 	const handleUpdateShowHistoryOnLoad = async (checked: boolean) => {
 		if (isLoading) return;
-		updateSetting({ showHistoryOnLoad: checked });
+		updateSetting({ autoShowHistory: checked });
 	};
 	// View ---------------------------------------------
 	const monitoring = settings?.monitoringEnabled;
@@ -99,7 +90,7 @@ const SettingsDrawer = ({ isOpen, onClose }: SettingsDrawerProps) => {
 				<div>
 					<p className="mb-2 text-gray-600 dark:text-gray-300">Monitoring status:</p>
 					{isLoading ? (
-						<span className="text-blue-500">{loadingMessage}</span>
+						<span className="text-blue-500">{settingsMessage}</span>
 					) : monitoring ? (
 						<span className="text-green-600 font-bold">Running</span>
 					) : (
@@ -201,10 +192,10 @@ const SettingsDrawer = ({ isOpen, onClose }: SettingsDrawerProps) => {
 					)}
 				</div>
 				<Switcher
-					checked={!!settings?.showHistoryOnLoad}
+					checked={!!settings?.autoShowHistory}
 					onChange={checked => handleUpdateShowHistoryOnLoad(checked)}
 					disabled={isLoading}
-					label="Enable Fetch History on Load"
+					label="Enable Auto Fetch of History"
 				/>
 				<hr className="border-t border-white" />
 				<button

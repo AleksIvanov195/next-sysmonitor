@@ -10,6 +10,7 @@ import StatsTagCard from "../entity/cards/StatsTagsCard";
 import Gauge from "../UI/graphs/Gauge";
 import HistoryView from "./HistoryView";
 import DiskGraph from "../entity/graphs/DiskGraphs";
+import { useSettings } from "../SettingsProvider";
 
 type SystemData = {
   cpu: CpuInfo;
@@ -21,6 +22,8 @@ type SystemData = {
 };
 
 const StatsView = () => {
+	// Initialisation ---------------------------------------------
+	const { settings } = useSettings();
 	// State ---------------------------------------------
 	const [data, setData] = useState<SystemData | null>(null);
 	const [selectedDisk, setSelectedDisk] = useState<DiskFormatted | null>(null);
@@ -59,6 +62,10 @@ const StatsView = () => {
 
 		return () => clearInterval(interval);
 	}, []);
+
+	useEffect(() => {
+		setIsHistoryEnabled(!!settings?.autoShowHistory);
+	}, [settings?.autoShowHistory]);
 
 	// Handlers ---------------------------------------------
 	const handleDiskSelect = (disk: DiskFormatted) => {
