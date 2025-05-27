@@ -4,7 +4,7 @@ export interface CpuInfo {
   speed: number;
   cores: number;
 	socket?: string;
-	virtualization?: string;
+	virtualization?: boolean;
 }
 
 export interface MemoryInfo {
