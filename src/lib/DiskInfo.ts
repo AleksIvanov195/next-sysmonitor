@@ -12,10 +12,8 @@ const getDiskInfoForPlatform = () => {
 };
 
 export const getDiskInfo = async () => {
-	if (!cachedDisk) {
-		cachedDisk = await getDiskInfoForPlatform();
-	}
-	return cachedDisk;
+	if (cachedDisk) return cachedDisk;
+	return await refreshDiskInfo();
 };
 
 export const refreshDiskInfo = async () =>{

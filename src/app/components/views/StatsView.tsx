@@ -11,6 +11,7 @@ import Gauge from "../UI/graphs/Gauge";
 import HistoryView from "./HistoryView";
 import DiskGraph from "../entity/graphs/DiskGraphs";
 import { useSettings } from "../SettingsProvider";
+import useLoad from "../apiutils/useLoad";
 
 type SystemData = {
   cpu: CpuInfo;
@@ -25,43 +26,22 @@ const StatsView = () => {
 	// Initialisation ---------------------------------------------
 	const { settings } = useSettings();
 	// State ---------------------------------------------
-	const [data, setData] = useState<SystemData | null>(null);
 	const [selectedDisk, setSelectedDisk] = useState<DiskFormatted | null>(null);
 	const [selectedNetworkStat, setSelectedNetworkStat] = useState<string>("Download");
 	const [isHistoryEnabled, setIsHistoryEnabled] = useState<boolean>(false);
+	const [data,,,, reload] = useLoad<SystemData>("/api/dynamic-system-info");
 
 	useEffect(() => {
-		// Fetch full system info on first load
-		const fetchFullSystemInfo = async () => {
-			const res = await fetch("/api/system-info");
-			const result = (await res.json()) as SystemData;
-			setData(result);
-
-			// Set the first disk as default
-			if (result.disk?.length > 0) {
-				setSelectedDisk(result.disk[0]);
-			}
-		};
-		// Fetch dynamic system info periodically
-		const fetchDynamicSystemInfo = async () => {
-			const res = await fetch("/api/dynamic-system-info");
-			const result = await res.json();
-			setData((prevData) => {
-				if (!prevData) return null;
-				return {
-					...prevData,
-					memory: result.memory,
-					currentLoad: result.currentLoad,
-					cpuTemp: result.cpuTemp,
-					network: result.network,
-				};
-			});
-		};
-		fetchFullSystemInfo();
-		const interval = setInterval(fetchDynamicSystemInfo, 10000);
-
+		reload();
+		const interval = setInterval(reload, 10000);
 		return () => clearInterval(interval);
 	}, []);
+
+	useEffect(() => {
+		if (data && !selectedDisk && data.disk.length > 0) {
+			setSelectedDisk(data.disk[0]);
+		}
+	}, [data]);
 
 	useEffect(() => {
 		setIsHistoryEnabled(!!settings?.autoShowHistory);
@@ -97,7 +77,6 @@ const StatsView = () => {
 					bottomText={`temp: ${data.cpuTemp.main}`}
 					chart = {
 						<CpuGraph
-							info = {data.cpu}
 							load = {data.currentLoad}
 						/>}
 				/>

@@ -83,10 +83,9 @@ const SettingsDrawer = ({ isOpen, onClose }: SettingsDrawerProps) => {
 	const monitoring = settings?.monitoringEnabled;
 	const interval = settings?.monitoringInterval;
 	return (
-		<Drawer id="settings-drawer" isOpen={isOpen} onClose={onClose} title="Settings">
+		<Drawer id="settingsDrawer" isOpen={isOpen} onClose={onClose} title="Settings">
 			<div className="flex flex-col gap-4">
 
-				{/* Monitoring Status */}
 				<div>
 					<p className="mb-2 text-gray-600 dark:text-gray-300">Monitoring status:</p>
 					{isLoading ? (
@@ -138,7 +137,6 @@ const SettingsDrawer = ({ isOpen, onClose }: SettingsDrawerProps) => {
 						</p>
 					)}
 				</div>
-				{/* CPU History Points Section */}
 				<div>
 					<label className="block text-gray-600 dark:text-gray-300 mb-1">CPU History Points:</label>
 					<div className="flex gap-2">
@@ -164,8 +162,6 @@ const SettingsDrawer = ({ isOpen, onClose }: SettingsDrawerProps) => {
 						</p>
 					)}
 				</div>
-
-				{/* Network History Points Section */}
 				<div>
 					<label className="block text-gray-600 dark:text-gray-300 mb-1">Network History Points:</label>
 					<div className="flex gap-2">

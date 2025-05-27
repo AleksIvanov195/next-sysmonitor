@@ -3,64 +3,44 @@ import { MemoryInfo, SystemLoad, CpuTemp, CpuInfo, CpuMetric } from "./types/sys
 import { BasicNetworkStats } from "./types/network";
 import { getDiskInfo, refreshDiskInfo } from "./DiskInfo";
 import { getNetworkHistory, getNetworkStats } from "./NetworkInfo";
-import { getCpuHistory, getCpuInfo, getCpuMetrics } from "./CpuInfo";
+import { getCpuHistory, getCpuMetrics } from "./CpuInfo";
+import { getStaticSystemInfo } from "./FullSystemStaticInfo";
 
 export async function getSystemInfo() {
-	const [memory, cpu, cpuMetrics, cpuHistory, network, networkHistory]:
-	[MemoryInfo, CpuInfo, CpuMetric, CpuMetric[], BasicNetworkStats, BasicNetworkStats[]] = await Promise.all([
-		si.mem(),
-		getCpuInfo(),
-		getCpuMetrics(),
-		getCpuHistory(),
-		getNetworkStats(),
-		getNetworkHistory(),
-	]);
-
-	const disk = await getDiskInfo();
-	  return {
-		cpu,
-		memory,
-		disk,
-		currentLoad: cpuMetrics.load,
-		cpuTemp: cpuMetrics.temp,
-		cpuHistory,
-		network,
-		networkHistory,
-	};
+	const info = await getStaticSystemInfo();
+	return info;
 }
 
 export async function getDynamicSystemInfo() {
 
-	const [memory, cpuMetrics, cpuHistory, network, networkHistory]:
-	[MemoryInfo, CpuMetric, CpuMetric[], BasicNetworkStats, BasicNetworkStats[]] = await Promise.all([
+	const [memory, cpuMetrics, network]:
+	[MemoryInfo, CpuMetric, BasicNetworkStats] = await Promise.all([
 		si.mem(),
 		getCpuMetrics(),
-		getCpuHistory(),
 		getNetworkStats(),
-		getNetworkHistory(),
 	]);
+
+	const disk = await getDiskInfo();
 	return {
 		memory,
+		disk,
 		currentLoad: cpuMetrics.load,
 		cpuTemp: cpuMetrics.temp,
-		cpuHistory,
 		network,
-		networkHistory,
 	};
 }
 export async function getFreshSystemInfo() {
-	const [cpu, memory, currentLoad, cpuTemp, network, networkHistory]: [CpuInfo, MemoryInfo, SystemLoad, CpuTemp, BasicNetworkStats, BasicNetworkStats[]] = await Promise.all([
+	const [cpu, memory, currentLoad, cpuTemp, network]: [CpuInfo, MemoryInfo, SystemLoad, CpuTemp, BasicNetworkStats] = await Promise.all([
 		si.cpu(),
 		si.mem(),
 		si.currentLoad(),
 		si.cpuTemperature(),
 		getNetworkStats(),
-		getNetworkHistory(),
 	]);
 
 	const disk = await refreshDiskInfo();
 
-	return { cpu, memory, disk, currentLoad, cpuTemp, network, networkHistory };
+	return { cpu, memory, disk, currentLoad, cpuTemp, network };
 }
 
 export async function getHistoricData() {

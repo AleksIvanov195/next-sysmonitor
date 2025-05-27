@@ -3,6 +3,8 @@ export interface CpuInfo {
   brand: string;
   speed: number;
   cores: number;
+	socket?: string;
+	virtualization?: string;
 }
 
 export interface MemoryInfo {

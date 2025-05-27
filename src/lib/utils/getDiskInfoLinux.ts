@@ -23,7 +23,6 @@ const getUsedSpace = (disk: RawDisk) => {
 	}
 	// If children then do a recursive call to getUsedSpace for each child
 	if(disk.children) {
-		console.log("disk child:", disk.children);
 		disk.children.forEach((child : RawDisk)=> {
 			usedSpace += getUsedSpace(child);
 		});

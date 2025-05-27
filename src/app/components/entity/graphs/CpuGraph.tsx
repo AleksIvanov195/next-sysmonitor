@@ -1,8 +1,7 @@
 import { CPUGraphProps } from "./Graphs.types";
 import DonutChart from "../../UI/graphs/DonutChart";
 
-const CpuGraph = ({ info, load }: CPUGraphProps) => {
-	console.log(info);
+const CpuGraph = ({ load }: CPUGraphProps) => {
 	const part1 = {
 		value: Math.round(load.currentLoad),
 		name: "Used (%)",

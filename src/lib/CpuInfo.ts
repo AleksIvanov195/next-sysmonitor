@@ -3,7 +3,7 @@ import { CpuInfo, CpuTemp, SystemLoad, Response } from "./types/system";
 import { CpuMetric } from "./types/system";
 import { readHistory, writeHistory } from "./history";
 
-let cpuInfo: CpuInfo | null = null;
+// let cpuInfo: CpuInfo | null = null;
 let cpuTimer: NodeJS.Timeout | null = null;
 
 let isFirstRun = true;
@@ -15,11 +15,15 @@ let isMonitoringActive = false;
 const fileName = "cpuHistory";
 
 
-export const getCpuInfo = async () => {
-	if (!cpuInfo) {
-		cpuInfo = await si.cpu();
-	}
-	return cpuInfo;
+/* export const getCpuInfo = async () => {
+	if (cpuInfo) return cpuInfo;
+
+	return await refreshCpuInfo();
+};*/
+
+export const getCpuInfo = async () : Promise<CpuInfo>=> {
+	// cpuInfo = await si.cpu();
+	return await si.cpu();
 };
 
 export const fetchCpuMetrics = async (): Promise<CpuMetric> => {
@@ -55,7 +59,7 @@ export const fetchCpuMetrics = async (): Promise<CpuMetric> => {
 		const data = {
 			timestamp: Date.now(),
 			load: currentLoad,
-			temp: cpuTemp,
+			temp: cpuTemp.main ? cpuTemp : { main: 0 },
 		};
 		lastRequestTime = Date.now();
 		return data;

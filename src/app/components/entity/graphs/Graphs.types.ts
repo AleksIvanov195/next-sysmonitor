@@ -1,7 +1,6 @@
-import { CpuInfo, SystemLoad, MemoryInfo } from "@/lib/types/system";
+import { SystemLoad, MemoryInfo } from "@/lib/types/system";
 
 export interface CPUGraphProps {
-	info: CpuInfo;
 	load: SystemLoad;
 }
 

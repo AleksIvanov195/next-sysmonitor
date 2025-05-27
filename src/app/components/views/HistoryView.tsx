@@ -78,7 +78,7 @@ const HistoryView = ({}) => {
 							name: "Temperature",
 							data: historicData.cpuHistory.map(point => ({
 								timestamp: point.timestamp,
-								value: parseFloat(point.temp.main.toFixed(2)),
+								value: parseFloat((point.temp.main ?? 0).toFixed(2)),
 							})),
 							color: "#ff4560",
 						},
