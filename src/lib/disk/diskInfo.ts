@@ -1,7 +1,7 @@
 import * as os from "os";
-import { DiskFormatted } from "./types/disk";
-import { getDiskInfoLinux } from "./utils/getDiskInfoLinux";
-import { getDiskInfoWindows } from "./utils/getDiskInfoWindows";
+import { DiskFormatted } from "../types/disk";
+import { getDiskInfoLinux } from "./getDiskInfoLinux";
+import { getDiskInfoWindows } from "./getDiskInfoWindows";
 
 
 let cachedDisk: DiskFormatted[] | null = null;

@@ -1,7 +1,7 @@
 "use client";
 import { useContext, createContext, ReactNode } from "react";
 import useLoad from "./apiutils/useLoad";
-import { AppSettings } from "@/lib/settings";
+import { AppSettings } from "@/lib/settings/settingsManager";
 import API from "./apiutils/API";
 
 interface SettingsContext{

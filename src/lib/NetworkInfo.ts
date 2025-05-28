@@ -1,7 +1,9 @@
 import si from "systeminformation";
 import { BasicNetworkStats } from "./types/network";
 import { Response } from "./types/system";
-import { readHistory, writeHistory } from "./history";
+import { readHistory, writeHistory } from "./history/historyManager";
+import { waitForUnlock } from "./utils/waitForUnlock";
+import { minIntervalWait } from "./utils/minIntervalWait";
 
 /*
 	RxBytes show the number of bytes recived by the network interface
@@ -21,17 +23,8 @@ const fileName = "networkHistory";
 
 export const fetchNetworkStats = async () : Promise<BasicNetworkStats> => {
 	// If a request is already in progress, wait for it to complete
-	  if (isRequestInProgress) {
-		await new Promise(resolve => {
-			const checkLock = () => {
-				if (!isRequestInProgress) {
-					resolve(null);
-				} else {
-					setTimeout(checkLock, 50);
-				}
-			};
-			checkLock();
-		});
+	if (isRequestInProgress) {
+		await waitForUnlock(() => isRequestInProgress);
 	}
 	isRequestInProgress = true;
 	try {
@@ -72,17 +65,7 @@ export const getNetworkStats = async () : Promise<BasicNetworkStats> => {
 const logNetworkStats = async () : Promise<void>=> {
 	console.log("NETWORK POINTS", maxNetworkHistoryPoints);
 	try {
-		// Calculate minimum interval as 20% of the monitoring interval
-		// with bounds of 1-5 seconds to ensure reasonable values
-		const minInterval = Math.min(5000, Math.max(1000, Math.round(currentMonitoringInterval * 0.2)));
-
-		// If an on-demand request was made very recently, wait a bit
-		const timeSinceLastRequest = Date.now() - lastRequestTime;
-		if (timeSinceLastRequest < minInterval) {
-			await new Promise(resolve =>
-				setTimeout(resolve, minInterval - timeSinceLastRequest),
-			);
-		}
+		await minIntervalWait(currentMonitoringInterval, lastRequestTime);
 		const dataPoint = await fetchNetworkStats();
 
 		writeHistory(fileName, dataPoint, maxNetworkHistoryPoints);
@@ -125,7 +108,7 @@ export const stopNetworkMonitoring = async () : Promise<Response> => {
 		}
 		clearInterval(networkTimer);
 		networkTimer = null;
-		isMonitoringActive = true;
+		isMonitoringActive = false;
 		console.log("Stopped network monitoring.");
 		return {
 			success: true,

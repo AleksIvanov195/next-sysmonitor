@@ -1,10 +1,10 @@
 import si from "systeminformation";
 import { MemoryInfo, SystemLoad, CpuTemp, CpuInfo, CpuMetric } from "./types/system";
 import { BasicNetworkStats } from "./types/network";
-import { getDiskInfo, refreshDiskInfo } from "./DiskInfo";
-import { getNetworkHistory, getNetworkStats } from "./NetworkInfo";
-import { getCpuHistory, getCpuMetrics } from "./CpuInfo";
-import { getStaticSystemInfo } from "./FullSystemStaticInfo";
+import { getDiskInfo, refreshDiskInfo } from "./disk/diskInfo";
+import { getNetworkHistory, getNetworkStats } from "./networkInfo";
+import { getCpuHistory, getCpuMetrics } from "./cpuInfo";
+import { getStaticSystemInfo } from "./systemStaticInfo";
 
 export async function getSystemInfo() {
 	const info = await getStaticSystemInfo();

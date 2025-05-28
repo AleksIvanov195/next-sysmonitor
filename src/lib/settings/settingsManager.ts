@@ -9,7 +9,7 @@ export interface AppSettings {
 
 const defaultSettings: AppSettings = {
 	monitoringEnabled: false,
-	autoShowHistory: false,
+	autoShowHistory: true,
 	monitoringInterval: 60000,
 	cpuHistoryPoints: 1440,
 	networkHistoryPoints: 1440,

@@ -2,8 +2,8 @@ import si from "systeminformation";
 import type { Systeminformation } from "systeminformation";
 import type { CpuInfo } from "./types/system";
 import type { DiskFormatted } from "./types/disk";
-import { getCpuInfo } from "./CpuInfo";
-import { refreshDiskInfo } from "./DiskInfo";
+import { getCpuInfo } from "./cpuInfo";
+import { refreshDiskInfo } from "./disk/diskInfo";
 
 export interface StaticSystemInfo {
   cpu: CpuInfo;

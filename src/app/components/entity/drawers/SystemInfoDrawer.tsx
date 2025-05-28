@@ -1,7 +1,7 @@
 "use client";
 import Drawer from "../../UI/Drawer";
 import useLoad from "../../apiutils/useLoad";
-import { StaticSystemInfo } from "@/lib/FullSystemStaticInfo";
+import { StaticSystemInfo } from "@/lib/systemStaticInfo";
 import { bytesToGB } from "../../utils/bytesToGb";
 
 interface SystemInfoDrawerProps {

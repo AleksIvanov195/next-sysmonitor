@@ -1,6 +1,6 @@
 import fs from "fs";
-import { readSettings, writeSettings } from "./src/lib/settings.ts";
-import { applySettings } from "./src/lib/applySettings.ts";
+import { readSettings, writeSettings } from "./src/lib/settings/settingsManager.ts";
+import { applySettings } from "./src/lib/settings/applySettings.ts";
 
 let lastSettings = await readSettings();
 await applySettings(lastSettings);

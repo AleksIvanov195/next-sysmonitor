@@ -1,7 +1,7 @@
 import { exec } from "child_process";
 import { promisify } from "util";
 import { DiskFormatted } from "../types/disk";
-import { convertToBytes } from "./convertToBytes";
+import { convertToBytes } from "../utils/convertToBytes";
 
 // Convert exec to return a Promise
 const execPromise = promisify(exec);

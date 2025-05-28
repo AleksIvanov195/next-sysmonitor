@@ -1,7 +1,7 @@
-import { AppSettings } from "./settings";
-import { setMaxCpuHistoryPoints } from "./CpuInfo";
-import { setMaxNetworkHistoryPoints } from "./NetworkInfo";
-import { isMonitoring, restartMonitoring, stopMonitoring, startMonitoring } from "./monitorController";
+import { AppSettings } from "./settingsManager";
+import { setMaxCpuHistoryPoints } from "../cpuInfo";
+import { setMaxNetworkHistoryPoints } from "../networkInfo";
+import { isMonitoring, restartMonitoring, stopMonitoring, startMonitoring } from "../monitorController";
 
 let currentSettings: AppSettings | null = null;
 

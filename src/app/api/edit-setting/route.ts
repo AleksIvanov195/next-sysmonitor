@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readSettings, writeSettings, AppSettings } from "@/lib/settings";
+import { readSettings, writeSettings, AppSettings } from "@/lib/settings/settingsManager";
 
 export async function PUT(req: Request) {
 	try {

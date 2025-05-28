@@ -1,5 +1,5 @@
-import { startNetworkMonitoring, stopNetworkMonitoring, isNetworkMonitoring } from "./NetworkInfo";
-import { startCpuMonitoring, stopCpuMonitoring, isCpuMonitoring } from "./CpuInfo";
+import { startNetworkMonitoring, stopNetworkMonitoring, isNetworkMonitoring } from "./networkInfo";
+import { startCpuMonitoring, stopCpuMonitoring, isCpuMonitoring } from "./cpuInfo";
 import { Response } from "./types/system";
 
 interface MonitoringResponse extends Response {
@@ -8,7 +8,7 @@ interface MonitoringResponse extends Response {
 
 export const startMonitoring = async (interval = 20000) : Promise<Response> => {
 	try {
-		// Start both monitoring services
+		// Start monitoring services
 		await startNetworkMonitoring(interval);
 		await startCpuMonitoring(interval);
 

@@ -1,7 +1,9 @@
 import si from "systeminformation";
 import { CpuInfo, CpuTemp, SystemLoad, Response } from "./types/system";
 import { CpuMetric } from "./types/system";
-import { readHistory, writeHistory } from "./history";
+import { readHistory, writeHistory } from "./history/historyManager";
+import { waitForUnlock } from "./utils/waitForUnlock";
+import { minIntervalWait } from "./utils/minIntervalWait";
 
 // let cpuInfo: CpuInfo | null = null;
 let cpuTimer: NodeJS.Timeout | null = null;
@@ -28,16 +30,7 @@ export const getCpuInfo = async () : Promise<CpuInfo>=> {
 
 export const fetchCpuMetrics = async (): Promise<CpuMetric> => {
 	if (isRequestInProgress) {
-		await new Promise(resolve => {
-			const checkLock = () => {
-				if (!isRequestInProgress) {
-					resolve(null);
-				} else {
-					setTimeout(checkLock, 50);
-				}
-			};
-			checkLock();
-		});
+		await waitForUnlock(() => isRequestInProgress);
 	}
 	isRequestInProgress = true;
 	try {
@@ -82,15 +75,7 @@ export const getCpuMetrics = async (): Promise<CpuMetric> => {
 const logCpuMetrics = async (): Promise<void> => {
 	console.log("CPU POINTS", maxCpuHistoryPoints);
 	try {
-		const minInterval = Math.min(5000, Math.max(1000, Math.round(currentMonitoringInterval * 0.2)));
-
-		const timeSinceLastRequest = Date.now() - lastRequestTime;
-		if (timeSinceLastRequest < minInterval) {
-			await new Promise(resolve =>
-				setTimeout(resolve, minInterval - timeSinceLastRequest),
-			);
-		}
-
+		await minIntervalWait(currentMonitoringInterval, lastRequestTime);
 		const dataPoint = await fetchCpuMetrics();
 		writeHistory(fileName, dataPoint, maxCpuHistoryPoints);
 	} catch (error) {
@@ -103,7 +88,7 @@ export const getCpuHistory = async () => {
 	return fileHistory;
 };
 
-export const startCpuMonitoring = async (interval = 10000): Promise<Response> => {
+export const startCpuMonitoring = async (interval = 20000): Promise<Response> => {
 	try {
 		if (cpuTimer) {
 			throw new Error("CPU monitoring already running");
