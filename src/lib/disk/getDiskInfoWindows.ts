@@ -9,7 +9,7 @@ interface WindowsDiskInfo {
   mount: string;
 }
 
-export const getDiskInfoWindows = async () => {
+export const getDiskInfoWindows = async () : Promise<DiskFormatted[]> => {
 	const disks = await si.fsSize();
 	const formattedDisksInfo : DiskFormatted[] = [];
 

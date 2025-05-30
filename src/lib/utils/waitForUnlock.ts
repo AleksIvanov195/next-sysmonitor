@@ -1,4 +1,4 @@
-export async function waitForUnlock(lockRef: () => boolean): Promise<void> {
+export const waitForUnlock = async (lockRef: () => boolean): Promise<void> =>{
 	if (!lockRef()) return;
 	await new Promise<void>(resolve => {
 		const check = () => {
@@ -7,4 +7,4 @@ export async function waitForUnlock(lockRef: () => boolean): Promise<void> {
 		};
 		check();
 	});
-}
+};

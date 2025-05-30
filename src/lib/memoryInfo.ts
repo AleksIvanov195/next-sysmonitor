@@ -4,13 +4,14 @@ import { Response } from "./types/system";
 import { readHistory, writeHistory } from "./history/historyManager";
 import { minIntervalWait } from "./utils/minIntervalWait";
 
-let memoryTimer: NodeJS.Timeout | null = null;
-
-let lastRequestTime = 0;
-let currentMonitoringInterval = 20000;
-let maxMemoryHistoryPoints = 0;
-let isMonitoringActive = false;
-const fileName = "memoryHistory";
+const memoryState = {
+	timer: null as NodeJS.Timeout | null,
+	lastRequestTime: 0,
+	currentMonitoringInterval: 20000,
+	maxHistoryPoints: 0,
+	isMonitoringActive: false,
+	fileName: "memoryHistory",
+};
 
 export const fetchMemoryStats = async () : Promise<MemoryMetric> => {
 	try {
@@ -25,7 +26,7 @@ export const fetchMemoryStats = async () : Promise<MemoryMetric> => {
 			free,
 			available,
 		};
-		lastRequestTime = Date.now();
+		memoryState.lastRequestTime = Date.now();
 		return dataPoint;
 	} catch (error) {
 		console.error("Error getting memory stats:", error);
@@ -39,31 +40,31 @@ export const getMemoryStats = async () : Promise<MemoryMetric> => {
 
 const logMemoryStats = async () : Promise<void>=> {
 	try {
-		await minIntervalWait(currentMonitoringInterval, lastRequestTime);
+		await minIntervalWait(memoryState.currentMonitoringInterval, memoryState.lastRequestTime);
 		const dataPoint = await fetchMemoryStats();
 
-		writeHistory(fileName, dataPoint, maxMemoryHistoryPoints);
+		writeHistory(memoryState.fileName, dataPoint, memoryState.maxHistoryPoints);
 	} catch (error) {
 		console.error("Error recording memory stats:", error);
 	}
 };
 
 export const getMemoryHistory = async () => {
-	const fileHistory = readHistory<MemoryMetric>(fileName);
+	const fileHistory = readHistory<MemoryMetric>(memoryState.fileName);
 	return fileHistory;
 };
 
 export const startMemoryMonitoring = async (interval = 20000) : Promise<Response> => {
 	try {
-		if (memoryTimer) {
+		if (memoryState.timer) {
 			throw new Error("Memory monitoring already running");
 		}
-		currentMonitoringInterval = interval;
+		memoryState.currentMonitoringInterval = interval;
 		console.log("Starting memory monitoring...");
 		// Collect first data point immediately
 		logMemoryStats();
-		memoryTimer = setInterval(logMemoryStats, interval);
-		isMonitoringActive = true;
+		memoryState.timer = setInterval(logMemoryStats, interval);
+		memoryState.isMonitoringActive = true;
 
 		return {
 			success: true,
@@ -77,12 +78,12 @@ export const startMemoryMonitoring = async (interval = 20000) : Promise<Response
 
 export const stopMemoryMonitoring = async () : Promise<Response> => {
 	try {
-		if (!memoryTimer) {
+		if (!memoryState.timer) {
 			throw new Error("Memory monitoring is not running");
 		}
-		clearInterval(memoryTimer);
-		memoryTimer = null;
-		isMonitoringActive = false;
+		clearInterval(memoryState.timer);
+		memoryState.timer = null;
+		memoryState.isMonitoringActive = false;
 		console.log("Stopped memory monitoring.");
 		return {
 			success: true,
@@ -95,7 +96,7 @@ export const stopMemoryMonitoring = async () : Promise<Response> => {
 };
 
 export const setMaxMemoryHistoryPoints = (points: number) : void => {
-	maxMemoryHistoryPoints = points;
+	memoryState.maxHistoryPoints = points;
 };
 
-export const isMemoryMonitoring = (): boolean => isMonitoringActive;
+export const isMemoryMonitoring = (): boolean => memoryState.isMonitoringActive;

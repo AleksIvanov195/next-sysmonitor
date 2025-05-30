@@ -15,7 +15,7 @@ interface RawDisk {
   children?: RawDisk[];
 }
 
-const getUsedSpace = (disk: RawDisk) => {
+const getUsedSpace = (disk: RawDisk) : number => {
 	let usedSpace = 0;
 	// Get disk used space in bytes
 	if(disk.fsused != null) {
@@ -64,7 +64,7 @@ export const getDiskInfoLinux = async (): Promise<DiskFormatted[]> => {
 		const disks: DiskFormatted[] = [];
 
 		// The lsblk -J format outputs blockdevices array
-		parsedDisks.blockdevices.forEach((disk : RawDisk) => {
+		parsedDisks.blockdevices.forEach((disk : RawDisk) : void => {
 			if (disk.type === "disk") {
 				try {
 					const usedSpace = getUsedSpace(disk);

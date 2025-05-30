@@ -5,40 +5,32 @@ import { readHistory, writeHistory } from "./history/historyManager";
 import { waitForUnlock } from "./utils/waitForUnlock";
 import { minIntervalWait } from "./utils/minIntervalWait";
 
-// let cpuInfo: CpuInfo | null = null;
-let cpuTimer: NodeJS.Timeout | null = null;
-
-let isFirstRun = true;
-let lastRequestTime = 0;
-let isRequestInProgress = false;
-let currentMonitoringInterval = 20000;
-let maxCpuHistoryPoints = 0;
-let isMonitoringActive = false;
-const fileName = "cpuHistory";
-
-
-/* export const getCpuInfo = async () => {
-	if (cpuInfo) return cpuInfo;
-
-	return await refreshCpuInfo();
-};*/
+const cpuState = {
+	timer: null as NodeJS.Timeout | null,
+	isFirstRun: true,
+	lastRequestTime: 0,
+	isRequestInProgress: false,
+	currentMonitoringInterval: 20000,
+	maxHistoryPoints: 0,
+	isMonitoringActive: false,
+	fileName: "cpuHistory",
+};
 
 export const getCpuInfo = async () : Promise<CpuInfo>=> {
-	// cpuInfo = await si.cpu();
 	return await si.cpu();
 };
 
 export const fetchCpuMetrics = async (): Promise<CpuMetric> => {
 	// The library calculates CPU load and temperature based on the time between calls.
 	// If si.currentLoad() or si.cpuTemperature() is called too frequently or concurrently results may be inaccurate and that is why there are artifical locks introduced
-	if (isRequestInProgress) {
-		await waitForUnlock(() => isRequestInProgress);
+	if (cpuState.isRequestInProgress) {
+		await waitForUnlock(() => cpuState.isRequestInProgress);
 	}
-	isRequestInProgress = true;
+	cpuState.isRequestInProgress = true;
 	try {
-		if (isFirstRun) {
+		if (cpuState.isFirstRun) {
 			await si.currentLoad();
-			isFirstRun = false;
+			cpuState.isFirstRun = false;
 			await new Promise(resolve => setTimeout(resolve, 1000));
 		}
 
@@ -56,7 +48,7 @@ export const fetchCpuMetrics = async (): Promise<CpuMetric> => {
 			load: { currentLoad: currentLoad.currentLoad },
 			temp: cpuTemp.main ? cpuTemp : { main: 0 },
 		};
-		lastRequestTime = Date.now();
+		cpuState.lastRequestTime = Date.now();
 		return data;
 	} catch (error) {
 		console.error("Error getting CPU metrics:", error);
@@ -66,7 +58,7 @@ export const fetchCpuMetrics = async (): Promise<CpuMetric> => {
 			temp: { main: 0 },
 		};
 	} finally {
-		isRequestInProgress = false;
+		cpuState.isRequestInProgress = false;
 	}
 };
 
@@ -76,30 +68,30 @@ export const getCpuMetrics = async (): Promise<CpuMetric> => {
 
 const logCpuMetrics = async (): Promise<void> => {
 	try {
-		await minIntervalWait(currentMonitoringInterval, lastRequestTime);
+		await minIntervalWait(cpuState.currentMonitoringInterval, cpuState.lastRequestTime);
 		const dataPoint = await fetchCpuMetrics();
-		writeHistory(fileName, dataPoint, maxCpuHistoryPoints);
+		writeHistory(cpuState.fileName, dataPoint, cpuState.maxHistoryPoints);
 	} catch (error) {
 		console.error("Error recording CPU metrics:", error);
 	}
 };
 
 export const getCpuHistory = async () => {
-	const fileHistory = readHistory<CpuMetric>(fileName);
+	const fileHistory = readHistory<CpuMetric>(cpuState.fileName);
 	return fileHistory;
 };
 
 export const startCpuMonitoring = async (interval = 20000): Promise<Response> => {
 	try {
-		if (cpuTimer) {
+		if (cpuState.timer) {
 			throw new Error("CPU monitoring already running");
 		}
-		currentMonitoringInterval = interval;
+		cpuState.currentMonitoringInterval = interval;
 		console.log("Starting CPU monitoring...");
 		// Collect first data point immediately
 		logCpuMetrics();
-		cpuTimer = setInterval(logCpuMetrics, interval);
-		isMonitoringActive = true;
+		cpuState.timer = setInterval(logCpuMetrics, interval);
+		cpuState.isMonitoringActive = true;
 
 		return {
 			success: true,
@@ -113,12 +105,12 @@ export const startCpuMonitoring = async (interval = 20000): Promise<Response> =>
 
 export const stopCpuMonitoring = async (): Promise<Response> => {
 	try {
-		if (!cpuTimer) {
+		if (!cpuState.timer) {
 			throw new Error("CPU monitoring is not running");
 		}
-		clearInterval(cpuTimer);
-		cpuTimer = null;
-		isMonitoringActive = false;
+		clearInterval(cpuState.timer);
+		cpuState.timer = null;
+		cpuState.isMonitoringActive = false;
 		console.log("Stopped CPU monitoring.");
 		return {
 			success: true,
@@ -131,7 +123,7 @@ export const stopCpuMonitoring = async (): Promise<Response> => {
 };
 
 export const setMaxCpuHistoryPoints = (points: number) : void => {
-	maxCpuHistoryPoints = points;
+	cpuState.maxHistoryPoints = points;
 };
 
-export const isCpuMonitoring = (): boolean => isMonitoringActive;
+export const isCpuMonitoring = (): boolean => cpuState.isMonitoringActive;

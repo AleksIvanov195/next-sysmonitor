@@ -1,6 +1,6 @@
 import { ByteUnit } from "../types/disk";
 
-export const convertToBytes = (sizeString: string) => {
+export const convertToBytes = (sizeString: string) : number => {
 	const value: number = parseFloat(sizeString);
 	if (isNaN(value)) return 0;
 
