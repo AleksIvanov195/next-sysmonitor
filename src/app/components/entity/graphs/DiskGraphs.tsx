@@ -8,11 +8,11 @@ interface DiskGraphsProps {
 
 const DiskGraph = ({ disk }: DiskGraphsProps) => {
 	const part1 = {
-		value: parseFloat(bytesToGB(disk.fsused)),
+		value: bytesToGB(disk.fsused),
 		name: "Used (GB)",
 	};
 	const part2 = {
-		value: parseFloat(bytesToGB(disk.size - disk.fsused)),
+		value: bytesToGB(disk.size - disk.fsused),
 		name: "Free (GB)",
 	};
 

@@ -1,29 +1,24 @@
 "use client";
 import StatsTagCard from "../entity/cards/StatsTagsCard";
 import LineChart from "../UI/graphs/LineChart";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { BasicNetworkStats } from "@/lib/types/network";
 import { CpuMetric } from "@/lib/types/system";
+import { MemoryMetric } from "@/lib/types/system";
+import useLoad from "../apiutils/useLoad";
+import { bytesToGB } from "../utils/bytesToGb";
 
 interface HistoricData {
 	networkHistory: BasicNetworkStats[];
 	cpuHistory: CpuMetric[];
+	memoryHistory: MemoryMetric[];
 }
 type HistoryTag = "CPU" | "Memory" | "Network";
 
 const HistoryView = ({}) => {
 	// State ---------------------------------------------
-	const [historicData, setHistoricData] = useState<HistoricData | null>(null);
+	const [historicData,,,, reloadHistoricData] = useLoad<HistoricData>("/api/historic-system-info");
 	const [selectedTag, setSelectedTag] = useState<HistoryTag>("Network");
-	useEffect(() => {
-		// Fetch historic data on first load
-		const fetchHistoricData = async () => {
-			const res = await fetch("/api/historic-system-info");
-			const result = (await res.json()) as HistoricData;
-			setHistoricData(result);
-		};
-		fetchHistoricData();
-	}, []);
 	// Handlers ---------------------------------------------
 	const handleTagClick = (tag: string) => {
 		setSelectedTag(tag as HistoryTag);
@@ -88,17 +83,48 @@ const HistoryView = ({}) => {
 				/>
 			);
 		}
+		if (selectedTag === "Memory") {
+			return (
+				<LineChart
+					key={selectedTag}
+					title="Memory Usage History"
+					series={[
+						{
+							name: "Used",
+							data: historicData.memoryHistory.map(point => ({
+								timestamp: point.timestamp,
+								value: bytesToGB(point.total - point.available),
+							})),
+							color: "#60a5fa",
+						},
+						                {
+							name: "Available",
+							data: historicData.memoryHistory.map(point => ({
+								timestamp: point.timestamp,
+								value: bytesToGB(point.available),
+							})),
+							color: "#34d399",
+						},
+					]}
+					yAxisName="Used (GB)"
+					height={256}
+				/>
+			);
+		}
 
 		return null;
 	};
 	return (
-		<StatsTagCard
-			title=""
-			tags={["Network", "CPU", "Memory"]}
-			onTagClick={handleTagClick}
-			selectedTag={selectedTag}
-			chart={renderChart()}
-		/>
+		<>
+			<button onClick={() => reloadHistoricData()}> RELOAD </button>
+			<StatsTagCard
+				title=""
+				tags={["Network", "CPU", "Memory"]}
+				onTagClick={handleTagClick}
+				selectedTag={selectedTag}
+				chart={renderChart()}
+			/>
+		</>
 	);
 };
 

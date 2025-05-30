@@ -15,7 +15,6 @@ export interface MemoryInfo {
 }
 
 export interface SystemLoad {
-  avgLoad: number;
   currentLoad: number;
 	cpus?: unknown;
 }
@@ -30,6 +29,9 @@ export interface CpuMetric {
 	timestamp: number;
 }
 
+export interface MemoryMetric extends MemoryInfo{
+	timestamp: number;
+}
 export interface Response {
   success: boolean;
   message: string;

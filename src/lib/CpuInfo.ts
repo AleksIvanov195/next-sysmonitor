@@ -29,6 +29,8 @@ export const getCpuInfo = async () : Promise<CpuInfo>=> {
 };
 
 export const fetchCpuMetrics = async (): Promise<CpuMetric> => {
+	// The library calculates CPU load and temperature based on the time between calls.
+	// If si.currentLoad() or si.cpuTemperature() is called too frequently or concurrently results may be inaccurate and that is why there are artifical locks introduced
 	if (isRequestInProgress) {
 		await waitForUnlock(() => isRequestInProgress);
 	}
@@ -51,7 +53,7 @@ export const fetchCpuMetrics = async (): Promise<CpuMetric> => {
 
 		const data = {
 			timestamp: Date.now(),
-			load: currentLoad,
+			load: { currentLoad: currentLoad.currentLoad },
 			temp: cpuTemp.main ? cpuTemp : { main: 0 },
 		};
 		lastRequestTime = Date.now();
@@ -60,7 +62,7 @@ export const fetchCpuMetrics = async (): Promise<CpuMetric> => {
 		console.error("Error getting CPU metrics:", error);
 		return {
 			timestamp: Date.now(),
-			load: { avgLoad: 0, currentLoad: 0 },
+			load: { currentLoad: 0 },
 			temp: { main: 0 },
 		};
 	} finally {
@@ -73,7 +75,6 @@ export const getCpuMetrics = async (): Promise<CpuMetric> => {
 };
 
 const logCpuMetrics = async (): Promise<void> => {
-	console.log("CPU POINTS", maxCpuHistoryPoints);
 	try {
 		await minIntervalWait(currentMonitoringInterval, lastRequestTime);
 		const dataPoint = await fetchCpuMetrics();

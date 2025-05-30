@@ -1,6 +1,7 @@
 import { AppSettings } from "./settingsManager";
 import { setMaxCpuHistoryPoints } from "../cpuInfo";
 import { setMaxNetworkHistoryPoints } from "../networkInfo";
+import { setMaxMemoryHistoryPoints } from "../memoryInfo";
 import { isMonitoring, restartMonitoring, stopMonitoring, startMonitoring } from "../monitorController";
 
 let currentSettings: AppSettings | null = null;
@@ -13,6 +14,10 @@ export async function applySettings(settings: AppSettings): Promise<void> {
 
 		if (!currentSettings || currentSettings.networkHistoryPoints !== settings.networkHistoryPoints) {
 			setMaxNetworkHistoryPoints(settings.networkHistoryPoints);
+		}
+
+		if (!currentSettings || currentSettings.memoryHistoryPoints !== settings.memoryHistoryPoints) {
+			setMaxMemoryHistoryPoints(settings.memoryHistoryPoints);
 		}
 
 		// Manage monitoring state

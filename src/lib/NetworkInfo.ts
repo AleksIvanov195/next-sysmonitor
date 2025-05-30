@@ -23,6 +23,7 @@ const fileName = "networkHistory";
 
 export const fetchNetworkStats = async () : Promise<BasicNetworkStats> => {
 	// If a request is already in progress, wait for it to complete
+	// Network stats like rx_sec and tx_sec are calculated based on the time between calls.
 	if (isRequestInProgress) {
 		await waitForUnlock(() => isRequestInProgress);
 	}
@@ -63,7 +64,6 @@ export const getNetworkStats = async () : Promise<BasicNetworkStats> => {
 };
 
 const logNetworkStats = async () : Promise<void>=> {
-	console.log("NETWORK POINTS", maxNetworkHistoryPoints);
 	try {
 		await minIntervalWait(currentMonitoringInterval, lastRequestTime);
 		const dataPoint = await fetchNetworkStats();

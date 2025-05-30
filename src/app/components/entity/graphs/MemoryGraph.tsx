@@ -5,11 +5,11 @@ import DonutChart from "../../UI/graphs/DonutChart";
 const MemoryGraph = ({ load }: MemoryGraphProps) => {
 
 	const part1 = {
-		value: parseFloat(bytesToGB(load.total - load.available)),
+		value: bytesToGB(load.total - load.available),
 		name: "Used (GB)",
 	};
 	const part2 = {
-		value: parseFloat(bytesToGB(load.available)),
+		value: bytesToGB(load.available),
 		name: "Available (GB)",
 	};
 	return (

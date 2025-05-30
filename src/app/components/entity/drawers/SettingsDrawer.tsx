@@ -32,12 +32,14 @@ const SettingsDrawer = ({ isOpen, onClose }: SettingsDrawerProps) => {
 	const intervalRef = useRef<HTMLInputElement>(null);
 	const cpuRef = useRef<HTMLInputElement>(null);
 	const networkRef = useRef<HTMLInputElement>(null);
+	const memoryRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
 		if (settings) {
 			if (intervalRef.current) intervalRef.current.value = settings.monitoringInterval?.toString() || "";
 			if (cpuRef.current) cpuRef.current.value = settings.cpuHistoryPoints?.toString() || "";
 			if (networkRef.current) networkRef.current.value = settings.networkHistoryPoints?.toString() || "";
+			if (memoryRef.current) memoryRef.current.value = settings.memoryHistoryPoints?.toString() || "";
 		}
 	}, [settings, isOpen]);
 	// Handlers ---------------------------------------------
@@ -74,6 +76,16 @@ const SettingsDrawer = ({ isOpen, onClose }: SettingsDrawerProps) => {
 		if (isNaN(newValue) || newValue < 1 || newValue === settings?.networkHistoryPoints) return;
 
 		await updateSetting({ networkHistoryPoints: newValue });
+	};
+	const handleUpdateMemoryHistory = async () => {
+		if (isLoading) return;
+
+		const rawValue = memoryRef.current?.value;
+		const newValue = rawValue ? parseInt(rawValue, 10) : NaN;
+
+		if (isNaN(newValue) || newValue < 1 || newValue === settings?.memoryHistoryPoints) return;
+
+		await updateSetting({ memoryHistoryPoints: newValue });
 	};
 	const handleUpdateShowHistoryOnLoad = async (checked: boolean) => {
 		if (isLoading) return;
@@ -181,9 +193,34 @@ const SettingsDrawer = ({ isOpen, onClose }: SettingsDrawerProps) => {
             Update
 						</button>
 					</div>
-					{settings?.cpuHistoryPoints && interval && (
+					{settings?.networkHistoryPoints && interval && (
 						<p className="mt-1 text-sm text-gray-500">
     					Records: <span className="font-mono">{formatDuration(settings.networkHistoryPoints * interval)}</span>
+						</p>
+					)}
+				</div>
+				<div>
+					<label className="block text-gray-600 dark:text-gray-300 mb-1">Memory History Points:</label>
+					<div className="flex gap-2">
+						<input
+							ref={memoryRef}
+							type="number"
+							className="px-3 py-2 rounded w-full text-sm border disabled:cursor-not-allowed border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 "
+							min={1}
+							disabled={isLoading}
+							placeholder="e.g. 1440"
+						/>
+						<button
+							onClick={handleUpdateMemoryHistory}
+							disabled={isLoading}
+							className="px-4 py-2 text-sm font-semibold rounded bg-blue-600 text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-75"
+						>
+            Update
+						</button>
+					</div>
+					{settings?.memoryHistoryPoints && interval && (
+						<p className="mt-1 text-sm text-gray-500">
+    					Records: <span className="font-mono">{formatDuration(settings.memoryHistoryPoints * interval)}</span>
 						</p>
 					)}
 				</div>

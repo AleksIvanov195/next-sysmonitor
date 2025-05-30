@@ -1,5 +1,6 @@
 import { startNetworkMonitoring, stopNetworkMonitoring, isNetworkMonitoring } from "./networkInfo";
 import { startCpuMonitoring, stopCpuMonitoring, isCpuMonitoring } from "./cpuInfo";
+import { startMemoryMonitoring, stopMemoryMonitoring, isMemoryMonitoring } from "./memoryInfo";
 import { Response } from "./types/system";
 
 interface MonitoringResponse extends Response {
@@ -11,6 +12,7 @@ export const startMonitoring = async (interval = 20000) : Promise<Response> => {
 		// Start monitoring services
 		await startNetworkMonitoring(interval);
 		await startCpuMonitoring(interval);
+		await startMemoryMonitoring(interval);
 
 		return {
 			success: true,
@@ -30,6 +32,7 @@ export const stopMonitoring = async () : Promise<Response> => {
 	try {
 		await stopNetworkMonitoring();
 		await stopCpuMonitoring();
+		await stopMemoryMonitoring();
 		return {
 			success: true,
 			message: "Monitoring services stopped successfully",
@@ -51,7 +54,7 @@ export const restartMonitoring = async (interval = 20000): Promise<Response> => 
 
 export const isMonitoring = async (): Promise<MonitoringResponse> => {
 	try {
-		if (isNetworkMonitoring() && isCpuMonitoring()) {
+		if (isNetworkMonitoring() && isCpuMonitoring() && isMemoryMonitoring()) {
 			return {
 				success: true,
 				message: "All monitoring services are running",
