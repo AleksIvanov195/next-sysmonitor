@@ -5,7 +5,18 @@ import { readHistory, writeHistory } from "./history/historyManager";
 import { waitForUnlock } from "./utils/waitForUnlock";
 import { minIntervalWait } from "./utils/minIntervalWait";
 
-const cpuState = {
+interface CpuState {
+	timer: NodeJS.Timeout | null,
+	isFirstRun: boolean,
+	lastRequestTime: number,
+	isRequestInProgress: boolean,
+	currentMonitoringInterval: number,
+	maxHistoryPoints: number,
+	isMonitoringActive: boolean,
+	fileName: string,
+}
+
+const cpuState: CpuState = {
 	timer: null as NodeJS.Timeout | null,
 	isFirstRun: true,
 	lastRequestTime: 0,

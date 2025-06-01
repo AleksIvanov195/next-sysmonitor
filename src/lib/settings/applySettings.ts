@@ -24,7 +24,7 @@ export async function applySettings(settings: AppSettings): Promise<void> {
 		const monitoringStatus = await isMonitoring();
 
 		if (settings.monitoringEnabled) {
-			if (!monitoringStatus.isMonitoring) {
+			if (!monitoringStatus) {
 				// Was off, should be on
 				await startMonitoring(settings.monitoringInterval);
 			} else if (currentSettings && currentSettings.monitoringInterval !== settings.monitoringInterval) {
@@ -33,7 +33,7 @@ export async function applySettings(settings: AppSettings): Promise<void> {
 			}
 			// else already on and interval unchanged, do nothing
 		} else {
-			if (monitoringStatus.isMonitoring) {
+			if (monitoringStatus) {
 			// Was on, should be off
 				await stopMonitoring();
 			}

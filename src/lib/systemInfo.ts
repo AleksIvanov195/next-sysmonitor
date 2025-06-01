@@ -1,5 +1,4 @@
-import si from "systeminformation";
-import { MemoryMetric, SystemLoad, CpuTemp, CpuInfo, CpuMetric } from "./types/system";
+import { MemoryMetric, CpuMetric } from "./types/system";
 import { BasicNetworkStats } from "./types/network";
 import { DiskFormatted } from "./types/disk";
 import { getDiskInfo, refreshDiskInfo } from "./disk/diskInfo";
@@ -30,18 +29,15 @@ export async function getDynamicSystemInfo() {
 		network,
 	};
 }
+
+// Used to refresh any cached data to display up-to-date results
 export async function getFreshSystemInfo() {
-	const [cpu, memory, currentLoad, cpuTemp, network]: [CpuInfo, MemoryMetric, SystemLoad, CpuTemp, BasicNetworkStats] = await Promise.all([
-		si.cpu(),
-		getMemoryStats(),
-		si.currentLoad(),
-		si.cpuTemperature(),
-		getNetworkStats(),
+	const [disk]: [DiskFormatted[]] = await Promise.all([
+		refreshDiskInfo(),
 	]);
-
-	const disk = await refreshDiskInfo();
-
-	return { cpu, memory, disk, currentLoad, cpuTemp, network };
+	return {
+		disk,
+	};
 }
 
 export async function getHistoricData() {

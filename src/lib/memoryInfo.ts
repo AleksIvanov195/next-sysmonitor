@@ -4,7 +4,16 @@ import { Response } from "./types/system";
 import { readHistory, writeHistory } from "./history/historyManager";
 import { minIntervalWait } from "./utils/minIntervalWait";
 
-const memoryState = {
+interface MemoryState {
+	timer: NodeJS.Timeout | null,
+	lastRequestTime: number,
+	currentMonitoringInterval: number,
+	maxHistoryPoints: number,
+	isMonitoringActive: boolean,
+	fileName: string,
+}
+
+const memoryState : MemoryState = {
 	timer: null as NodeJS.Timeout | null,
 	lastRequestTime: 0,
 	currentMonitoringInterval: 20000,

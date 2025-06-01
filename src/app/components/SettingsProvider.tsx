@@ -20,6 +20,9 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
 	const updateSetting = async (settingData: Partial<AppSettings>) => {
 		if (isLoading) return;
 		await API.put("/api/edit-setting", settingData);
+
+		// Wait a short time for settings monitor to process
+		await new Promise(resolve => setTimeout(resolve, 500));
 		reloadSettings();
 	};
 

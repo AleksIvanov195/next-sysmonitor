@@ -11,7 +11,19 @@ import { minIntervalWait } from "./utils/minIntervalWait";
 	rx_sec and tx_sec are calculated based on the time between calls to si.networkStats()
 	When on-demand calls and interval calls happen too close together, they interfere with each other
 */
-const networkState = {
+
+interface NetworkState {
+	timer: NodeJS.Timeout | null,
+	isFirstRun: boolean,
+	lastRequestTime: number,
+	isRequestInProgress: boolean,
+	currentMonitoringInterval: number,
+	maxHistoryPoints: number,
+	isMonitoringActive: boolean,
+	fileName: string,
+}
+
+const networkState : NetworkState = {
 	timer: null as NodeJS.Timeout | null,
 	isFirstRun: true,
 	lastRequestTime: 0,

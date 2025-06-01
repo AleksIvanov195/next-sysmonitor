@@ -1,3 +1,7 @@
+export interface WatcherError {
+  error: string | null;
+}
+
 export interface AppSettings {
   monitoringEnabled: boolean;
 	autoShowHistory: boolean,
@@ -5,6 +9,7 @@ export interface AppSettings {
 	cpuHistoryPoints: number;
   networkHistoryPoints: number;
   memoryHistoryPoints: number;
+	watcherError: WatcherError;
 }
 
 const defaultSettings: AppSettings = {
@@ -14,6 +19,7 @@ const defaultSettings: AppSettings = {
 	cpuHistoryPoints: 1440,
 	networkHistoryPoints: 1440,
 	memoryHistoryPoints: 1440,
+	watcherError: { error: null },
 };
 
 export const readSettings = async (): Promise<AppSettings> => {

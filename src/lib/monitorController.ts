@@ -1,72 +1,38 @@
 import { startNetworkMonitoring, stopNetworkMonitoring, isNetworkMonitoring } from "./networkInfo";
 import { startCpuMonitoring, stopCpuMonitoring, isCpuMonitoring } from "./cpuInfo";
 import { startMemoryMonitoring, stopMemoryMonitoring, isMemoryMonitoring } from "./memoryInfo";
-import { Response } from "./types/system";
 
-interface MonitoringResponse extends Response {
-	isMonitoring: boolean;
-}
-
-export const startMonitoring = async (interval = 20000) : Promise<Response> => {
+export const startMonitoring = async (interval = 20000): Promise<void> => {
 	try {
-		// Start monitoring services
 		await startNetworkMonitoring(interval);
 		await startCpuMonitoring(interval);
 		await startMemoryMonitoring(interval);
-
-		return {
-			success: true,
-			message: "Monitoring services started successfully",
-		};
 	} catch (error) {
 		console.error("Failed to start monitoring:", error);
-		stopMonitoring();
-		return {
-			success: false,
-			message: `Failed to start monitoring: ${error instanceof Error ? error.message : "Unknown error"}`,
-		};
+		await stopMonitoring();
+		throw new Error(`Failed to start monitoring: ${error instanceof Error ? error.message : "Unknown error"}`);
 	}
 };
 
-export const stopMonitoring = async () : Promise<Response> => {
+export const stopMonitoring = async (): Promise<void> => {
 	try {
 		await stopNetworkMonitoring();
 		await stopCpuMonitoring();
 		await stopMemoryMonitoring();
-		return {
-			success: true,
-			message: "Monitoring services stopped successfully",
-		};
 	} catch (error) {
 		console.error("Failed to stop monitoring:", error);
-		return {
-			success: false,
-			message: `Failed to stop monitoring: ${error instanceof Error ? error.message : "Unknown error"}`,
-
-		};
+		throw new Error(`Failed to stop monitoring: ${error instanceof Error ? error.message : "Unknown error"}`);
 	}
 };
 
-export const restartMonitoring = async (interval = 20000): Promise<Response> => {
+export const restartMonitoring = async (interval = 20000): Promise<void> => {
 	await stopMonitoring();
-	return startMonitoring(interval);
+	await startMonitoring(interval);
 };
 
-export const isMonitoring = async (): Promise<MonitoringResponse> => {
+export const isMonitoring = async (): Promise<boolean> => {
 	try {
-		if (isNetworkMonitoring() && isCpuMonitoring() && isMemoryMonitoring()) {
-			return {
-				success: true,
-				message: "All monitoring services are running",
-				isMonitoring: true,
-			};
-		} else {
-			return {
-				success: true,
-				message: "Some or all monitoring services are not running",
-				isMonitoring: false,
-			};
-		}
+		return isNetworkMonitoring() && isCpuMonitoring() && isMemoryMonitoring();
 	} catch (error) {
 		throw new Error(`Failed to check monitoring status: ${error instanceof Error ? error.message : "Unknown error"}`);
 	}

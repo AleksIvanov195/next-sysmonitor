@@ -27,7 +27,7 @@ function formatDuration(ms: number | undefined): string {
 
 const SettingsDrawer = ({ isOpen, onClose }: SettingsDrawerProps) => {
 	// Initialisation ---------------------------------------------
-	const { settings, settingsMessage, isLoading, updateSetting } = useSettings();
+	const { settings, settingsMessage, isLoading, reloadSettings, updateSetting } = useSettings();
 	// State ---------------------------------------------
 	const intervalRef = useRef<HTMLInputElement>(null);
 	const cpuRef = useRef<HTMLInputElement>(null);
@@ -42,6 +42,9 @@ const SettingsDrawer = ({ isOpen, onClose }: SettingsDrawerProps) => {
 			if (memoryRef.current) memoryRef.current.value = settings.memoryHistoryPoints?.toString() || "";
 		}
 	}, [settings, isOpen]);
+	useEffect(() => {
+		reloadSettings();
+	}, [isOpen]);
 	// Handlers ---------------------------------------------
 	const handleToggleMonitoring = async (enabled: boolean) => {
 		if (isLoading) return;
@@ -97,7 +100,8 @@ const SettingsDrawer = ({ isOpen, onClose }: SettingsDrawerProps) => {
 	return (
 		<Drawer id="settingsDrawer" isOpen={isOpen} onClose={onClose} title="Settings">
 			<div className="flex flex-col gap-4">
-
+				{settings?.watcherError.error &&
+				<p>{settings.watcherError.error}</p>}
 				<div>
 					<p className="mb-2 text-gray-600 dark:text-gray-300">Monitoring status:</p>
 					{isLoading ? (
