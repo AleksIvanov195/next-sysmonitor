@@ -3,6 +3,8 @@ import Drawer from "../../UI/Drawer";
 import useLoad from "../../apiutils/useLoad";
 import { StaticSystemInfo } from "@/lib/systemStaticInfo";
 import { bytesToGB } from "../../utils/bytesToGb";
+import API from "../../apiutils/API";
+import { useState } from "react";
 
 interface SystemInfoDrawerProps {
   isOpen: boolean;
@@ -13,11 +15,35 @@ const labelClass = "block text-gray-600 dark:text-gray-300 font-semibold mb-1";
 const valueClass = "text-gray-900 dark:text-gray-100 mb-2";
 
 const SystemInfoDrawer = ({ isOpen, onClose }: SystemInfoDrawerProps) => {
-	const [data] = useLoad<StaticSystemInfo>("/api/system-info", isOpen);
+	const [data,,, isLoading, reloadData] = useLoad<StaticSystemInfo>("/api/system-info", isOpen);
+	const [isUpdating, setIsUpdating] = useState(false);
+
+	const refreshSystemInfo = async () : Promise<void> => {
+		setIsUpdating(true);
+		try {
+			const response = await API.post("/api/refresh-system-info");
+			if(response.isSuccess) {
+				reloadData();
+			}
+		}finally {
+			setIsUpdating(false);
+		}
+	};
+	const loadingComponent = () => {
+		return <p>Loading system info...</p>;
+	};
+	if (isLoading || isUpdating) {
+		return (
+			<Drawer id="systemInfoDrawer" isOpen={isOpen} onClose={onClose} title="System Info">
+				{loadingComponent()}
+			</Drawer>
+		);
+	}
 	return (
 		<Drawer id="systemInfoDrawer" isOpen={isOpen} onClose={onClose} title="System Info">
-			{data ? (
+			{data && (
 				<div className="flex flex-col gap-4">
+					<button className="text-amber-50" onClick={refreshSystemInfo}>Refresh</button>
 					<div>
 						<div className={labelClass}>CPU</div>
 						<div><span className={labelClass}>Model:</span> <span className={valueClass}>{data.cpu.brand}</span></div>
@@ -114,8 +140,6 @@ const SystemInfoDrawer = ({ isOpen, onClose }: SystemInfoDrawerProps) => {
             Close Menu
 					</button>
 				</div>
-			) : (
-				<p>Loading system info...</p>
 			)}
 		</Drawer>
 	);
