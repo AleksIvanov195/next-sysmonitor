@@ -1,6 +1,6 @@
 # System Monitor (A Next.js & TypeScript Project)
 
-**Please Note:** This is a personal learning project and is currently in an early state. It is a work i -progress as I explore Next.js, TypeScript, and system monitoring.
+**Please Note:** This is a personal learning project and is currently in an early state. It is a work in progress as I explore Next.js, TypeScript, and system monitoring.
 
 ## Description
 A cross-platform system monitoring application built with Next.js and TypeScript. It provides a real-time look into system statistics like CPU load, memory usage, disk space, and network activity.
