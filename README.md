@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# System Monitor (A Next.js & TypeScript Project)
 
-## Getting Started
+**Please Note:** This is a personal learning project and is currently in an early state. It is a work i -progress as I explore Next.js, TypeScript, and system monitoring.
 
-First, run the development server:
+## Description
+A cross-platform system monitoring application built with Next.js and TypeScript. It provides a real-time look into system statistics like CPU load, memory usage, disk space, and network activity.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Key Features
+* **Real-time Monitoring:** View live updates for System Load, Memory, Disk, and Network usage.
+* **System Information:** A dedicated tab to view key computer hardware and OS stats.
+* **Historical Data:** Retrieve past statistics and visualise them on a graph.
+* **Settings:** Configure monitoring intervals and the duration for which stats are kept.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Target Platforms
+* Windows
+* Linux
+* Docker
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Technologies Used
+* **Framework:** Next.js
+* **Language:** TypeScript & JavaScript
+* **Styling:** Tailwind CSS
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## How to Run
+1.  Clone the repository.
+2.  Navigate to the project directory.
+3.  Install dependencies: `npm install`
+4.  In a separate terminal, start the backend statistics collector: `npm run watch`
+5.  Start the development server: `npm run dev`
 
-## Learn More
+## How to run on Docker
+**Please note: A `Dockerfile` has not been implemented for this project yet.** The commands below outline the planned process for building and running the container once the `Dockerfile` is complete.
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1.  Build the Docker image:
+    `sudo docker build -t sysmonitor .`
+2.  Run the container:
+    `sudo docker run -d --name sysmonitor --network=host -v /:/host:ro -v /dev:/dev:ro sysmonitor`
+    *Note: `network=host` is required to detect accurate network usage. The volume mounts (`/` and `/dev`) are required for accurate metrics of memory, CPU, and disk space. Not including these will lead to unexpected behaviour.*
+3.  Once the container is created, run the following command to install necessary disk utilities:
+    `sudo docker exec -it sysmonitor sh -c "apk update && apk add util-linux && lsblk"`
+    *Note: This is required because the application uses the `lsblk` command to retrieve disk information.*
