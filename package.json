@@ -8,7 +8,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "watch": "npx tsx settingsMonitor.js"
+    "watch": "tsx settingsMonitor.js",
+    "prod:start": "npm run build && pm2 start ecosystem.config.cjs",
+    "prod:status": "pm2 status",
+    "prod:logs": "pm2 logs",
+    "prod:restart": "pm2 restart all",
+    "prod:stop": "pm2 stop all",
+    "prod:delete": "pm2 delete all"
   },
   "dependencies": {
     "better-sqlite3": "^11.10.0",
@@ -28,7 +34,9 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.2.3",
+    "pm2": "^6.0.8",
     "tailwindcss": "^4",
+    "tsx": "^4.20.3",
     "typescript": "^5"
   }
 }
