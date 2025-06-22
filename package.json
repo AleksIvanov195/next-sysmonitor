@@ -11,10 +11,19 @@
     "watch": "tsx settingsMonitor.js",
     "prod:start": "npm run build && pm2 start ecosystem.config.cjs",
     "prod:status": "pm2 status",
-    "prod:logs": "pm2 logs",
+    "prod:processes": "pm2 jlist",
     "prod:restart": "pm2 restart all",
     "prod:stop": "pm2 stop all",
-    "prod:delete": "pm2 delete all"
+    "prod:logs": "pm2 logs",
+    "prod:logs:clear": "pm2 flush",
+    "prod:delete": "pm2 delete all",
+    "prod:restart:watcher": "pm2 restart settings-watcher",
+    "prod:stop:watcher": "pm2 stop settings-watcher",
+    "prod:logs:watcher": "pm2 logs settings-watcher --nostream",
+		"prod:describe:watcher": "pm2 describe settings-watcher",
+    "prod:restart:app": "pm2 restart sys-monitor-app",
+    "prod:stop:app": "pm2 stop sys-monitor-app",
+    "prod:logs:app": "pm2 logs sys-monitor-app"
   },
   "dependencies": {
     "better-sqlite3": "^11.10.0",

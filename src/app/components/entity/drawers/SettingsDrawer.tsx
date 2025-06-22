@@ -100,8 +100,6 @@ const SettingsDrawer = ({ isOpen, onClose }: SettingsDrawerProps) => {
 	return (
 		<Drawer id="settingsDrawer" isOpen={isOpen} onClose={onClose} title="Settings">
 			<div className="flex flex-col gap-4">
-				{settings?.watcherError.error &&
-				<p>{settings.watcherError.error}</p>}
 				<div>
 					<p className="mb-2 text-gray-600 dark:text-gray-300">Monitoring status:</p>
 					{isLoading ? (
