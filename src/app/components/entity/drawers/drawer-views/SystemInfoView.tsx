@@ -1,23 +1,17 @@
 "use client";
-import Drawer from "../../UI/Drawer";
-import useLoad from "../../apiutils/useLoad";
+import useLoad from "../../../apiutils/useLoad";
 import { StaticSystemInfo } from "@/lib/systemStaticInfo";
-import { bytesToGB } from "../../utils/bytesToGb";
-import API from "../../apiutils/API";
+import { bytesToGB } from "../../../utils/bytesToGb";
+import API from "../../../apiutils/API";
 import { useState } from "react";
+import { DrawerViewProps } from "../DrawerEntities.types";
 
-interface SystemInfoDrawerProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-const labelClass = "block text-gray-600 dark:text-gray-300 font-semibold mb-1";
-const valueClass = "text-gray-900 dark:text-gray-100 mb-2";
-
-const SystemInfoDrawer = ({ isOpen, onClose }: SystemInfoDrawerProps) => {
+const SystemInfoView = ({ isOpen }: DrawerViewProps) => {
+	// Initialisation ---------------------------------------------
 	const [data,,, isLoading, reloadData] = useLoad<StaticSystemInfo>("/api/system-info", isOpen);
+	// State ---------------------------------------------
 	const [isUpdating, setIsUpdating] = useState(false);
-
+	// Handlers ---------------------------------------------
 	const refreshSystemInfo = async () : Promise<void> => {
 		setIsUpdating(true);
 		try {
@@ -29,18 +23,14 @@ const SystemInfoDrawer = ({ isOpen, onClose }: SystemInfoDrawerProps) => {
 			setIsUpdating(false);
 		}
 	};
-	const loadingComponent = () => {
-		return <p>Loading system info...</p>;
-	};
 	if (isLoading || isUpdating) {
-		return (
-			<Drawer id="systemInfoDrawer" isOpen={isOpen} onClose={onClose} title="System Info">
-				{loadingComponent()}
-			</Drawer>
-		);
+		return <p className="text-center text-gray-400">Loading system info....</p>;
 	}
+	// View ---------------------------------------------
+	const labelClass = "block text-gray-600 dark:text-gray-300 font-semibold mb-1";
+	const valueClass = "text-gray-900 dark:text-gray-100 mb-2";
 	return (
-		<Drawer id="systemInfoDrawer" isOpen={isOpen} onClose={onClose} title="System Info">
+		<>
 			{data && (
 				<div className="flex flex-col gap-4">
 					<button className="text-amber-50" onClick={refreshSystemInfo}>Refresh</button>
@@ -132,17 +122,10 @@ const SystemInfoDrawer = ({ isOpen, onClose }: SystemInfoDrawerProps) => {
 						<div><span className={labelClass}>Serial:</span> <span className={valueClass}>{data.system.serial}</span></div>
 					</div>
 					<hr className="border-t border-white" />
-
-					<button
-						onClick={onClose}
-						className="w-full px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 mt-2"
-					>
-            Close Menu
-					</button>
 				</div>
 			)}
-		</Drawer>
+		</>
 	);
 };
 
-export default SystemInfoDrawer;
+export default SystemInfoView;
