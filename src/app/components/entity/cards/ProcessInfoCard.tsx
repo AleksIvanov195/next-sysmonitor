@@ -1,11 +1,14 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import { AppProcess } from "../drawers/drawer-views/AppProcessesView";
+import API from "../../apiutils/API";
 
 interface ProcessInfoCard {
 	process: AppProcess;
 	reloadProcesses: () => void;
 }
+
 const ProcessInfoCard = ({ process, reloadProcesses }: ProcessInfoCard) => {
 	// Initialisation ---------------------------------------------
 	// State ---------------------------------------------
@@ -13,8 +16,7 @@ const ProcessInfoCard = ({ process, reloadProcesses }: ProcessInfoCard) => {
 	// Handlers ---------------------------------------------
 	const handleRestart = async () => {
 		setIsRestarting(true);
-		await new Promise(resolve => setTimeout(resolve, 2000));
-		setIsRestarting(false);
+		await API.post("/api/settings-monitor/restart");
 		reloadProcesses();
 	};
 	// View ---------------------------------------------
@@ -55,18 +57,22 @@ const ProcessInfoCard = ({ process, reloadProcesses }: ProcessInfoCard) => {
 				>
 					{isRestarting ? "..." : "Restart"}
 				</button>
-				<button
-					disabled={isRestarting}
+				<Link
+					href={`/logs/${process.name}/out`}
+					target="_blank"
+					rel="noopener noreferrer"
 					className="px-4 p-1.5 text-xs font-semibold rounded bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-wait"
 				>
 					Logs
-				</button>
-				<button
-					disabled={isRestarting}
+				</Link>
+				<Link
+					href={`/logs/${process.name}/error`}
+					target="_blank"
+					rel="noopener noreferrer"
 					className="px-4 p-1.5 text-xs font-semibold rounded bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-wait"
 				>
 					Error Logs
-				</button>
+				</Link>
 			</div>
 		</div>
 	);
