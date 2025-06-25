@@ -19,6 +19,14 @@ const LogPageType = async ({ params }: { params: Promise<{ processName: string; 
 	}
 	return (
 		<LogLayout processName={processName}>
+			<div className="flex justify-end mb-4">
+				<a
+					href={`/api/logs/${processName}/${logType}/download`}
+					className="text-blue-400 hover:text-blue-500 hover:underline"
+				>
+  				Download Logs
+				</a>
+			</div>
 			<LogSection
 				title={logType === "error" ? "Error Logs" : "Standard Output"}
 				logs={logs}

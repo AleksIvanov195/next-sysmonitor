@@ -13,6 +13,7 @@ fs.watch("./data/settings.json", async (eventType) => {
 	if (eventType === "change") {
 		clearTimeout(timeout);
 		timeout = setTimeout(async () => {
+			console.log("Settings change detected, udpating...");
 			try {
 				const settings = await readSettings();
 				if (JSON.stringify(settings) !== JSON.stringify(lastSettings)) {
@@ -21,6 +22,7 @@ fs.watch("./data/settings.json", async (eventType) => {
 					console.log("Settings updated and applied.");
 				}
 			} catch (error) {
+				console.log("Error applying settings, please check error logs.");
 				console.error("Error applying settings:", error);
 				console.log("Reverting to previous settings...");
 				try {
@@ -31,6 +33,7 @@ fs.watch("./data/settings.json", async (eventType) => {
 					console.log("Successfully reverted to previous settings");
 
 				} catch (revertError) {
+					console.log("Error reverting settings, please check error logs.");
 					console.error("Failed to revert settings:", revertError);
 					console.error("System may need a restart.");
 				}
