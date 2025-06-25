@@ -10,9 +10,13 @@ const LogPageType = async ({ params }: { params: Promise<{ processName: string; 
 		notFound();
 	}
 
-	const logs : string = await getProcessLogs(processName, logType);
-
-
+	let logs: string;
+	try {
+		logs = await getProcessLogs(processName, logType);
+	} catch (error) {
+		console.error(`Error fetching logs for ${processName} (${logType}):`, error);
+		notFound();
+	}
 	return (
 		<LogLayout processName={processName}>
 			<LogSection

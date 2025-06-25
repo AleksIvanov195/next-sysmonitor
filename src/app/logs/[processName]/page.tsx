@@ -1,13 +1,22 @@
 import { getProcessLogs } from "@/lib/pm2logs";
 import { LogLayout } from "@/app/components/views/logs/LogLayout";
 import { LogSection } from "@/app/components/views/logs/LogSection";
+import { notFound } from "next/navigation";
 
 const LogPage = async ({ params }: { params: Promise<{ processName: string }> }) => {
 	const { processName } = await params;
-	const [outLogs, errLogs] : [string, string]  = await Promise.all([
-		getProcessLogs(processName, "out"),
-		getProcessLogs(processName, "error"),
-	]);
+
+	let outLogs: string;
+	let errLogs: string;
+	try{
+		[outLogs, errLogs] = await Promise.all([
+			getProcessLogs(processName, "out"),
+			getProcessLogs(processName, "error"),
+		]);
+	}catch (error) {
+		console.error(`Failed to fetch logs for "${processName}":`, error);
+		notFound();
+	}
 
 	return (
 		<LogLayout processName={processName}>
