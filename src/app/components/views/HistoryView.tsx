@@ -116,7 +116,7 @@ const HistoryView = ({}) => {
 	};
 	return (
 		<>
-			<button onClick={() => reloadHistoricData()}> RELOAD </button>
+			<button onClick={() => reloadHistoricData()} className="px-3 py-1 text-sm font-semibold rounded bg-white/10 text-white hover:bg-white/20"> RELOAD </button>
 			<StatsTagCard
 				title=""
 				tags={["Network", "CPU", "Memory"]}

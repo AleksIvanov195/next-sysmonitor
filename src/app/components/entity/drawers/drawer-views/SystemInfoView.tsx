@@ -33,7 +33,7 @@ const SystemInfoView = ({ isOpen }: DrawerViewProps) => {
 		<>
 			{data && (
 				<div className="flex flex-col gap-4">
-					<button className="text-amber-50" onClick={refreshSystemInfo}>Refresh</button>
+					<button className="px-3 py-1 text-sm font-semibold rounded bg-white/10 text-white hover:bg-white/20" onClick={refreshSystemInfo}>Refresh</button>
 					<div>
 						<div className={labelClass}>CPU</div>
 						<div><span className={labelClass}>Model:</span> <span className={valueClass}>{data.cpu.brand}</span></div>
