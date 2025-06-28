@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "watch": "tsx settingsMonitor.js",
+    "watch": "tsx settingsWatcher.js",
     "prod:start": "npm run build && pm2 start ecosystem.config.cjs",
     "prod:status": "pm2 status",
     "prod:processes": "pm2 jlist",

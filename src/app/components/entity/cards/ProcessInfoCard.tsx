@@ -16,7 +16,7 @@ const ProcessInfoCard = ({ process, reloadProcesses }: ProcessInfoCard) => {
 	// Handlers ---------------------------------------------
 	const handleRestart = async () => {
 		setIsRestarting(true);
-		await API.post("/api/settings-monitor/restart");
+		await API.post("/api/settings-watcher/restart");
 		reloadProcesses();
 	};
 	// View ---------------------------------------------

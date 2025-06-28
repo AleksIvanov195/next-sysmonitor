@@ -16,7 +16,7 @@ module.exports = {
 		{
 			name: "settings-watcher",
 			script: "node_modules/tsx/dist/cli.cjs",
-			args: "settingsMonitor.js",
+			args: "settingsWatcher.js",
 			instances: 1,
 			autorestart: true,
 			watch: false,
