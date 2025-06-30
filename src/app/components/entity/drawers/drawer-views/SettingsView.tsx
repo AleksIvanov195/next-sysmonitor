@@ -9,14 +9,16 @@ const SettingsView = ({ isOpen }: DrawerViewProps) => {
 	// Initialisation ---------------------------------------------
 	const { settings, settingsMessage, isLoading, reloadSettings, updateSetting } = useSettings();
 	// State ---------------------------------------------
-	const intervalRef = useRef<HTMLInputElement>(null);
+	const liveFetchingIntervalRef = useRef<HTMLInputElement>(null);
+	const monitoringIntervalRef = useRef<HTMLInputElement>(null);
 	const cpuRef = useRef<HTMLInputElement>(null);
 	const networkRef = useRef<HTMLInputElement>(null);
 	const memoryRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
 		if (settings) {
-			if (intervalRef.current) intervalRef.current.value = settings.monitoringInterval?.toString() || "";
+			if (liveFetchingIntervalRef.current) liveFetchingIntervalRef.current.value = settings.liveFetchingInterval?.toString() || "";
+			if (monitoringIntervalRef.current) monitoringIntervalRef.current.value = settings.monitoringInterval?.toString() || "";
 			if (cpuRef.current) cpuRef.current.value = settings.cpuHistoryPoints?.toString() || "";
 			if (networkRef.current) networkRef.current.value = settings.networkHistoryPoints?.toString() || "";
 			if (memoryRef.current) memoryRef.current.value = settings.memoryHistoryPoints?.toString() || "";
@@ -34,42 +36,29 @@ const SettingsView = ({ isOpen }: DrawerViewProps) => {
 	const handleUpdateInterval = async () => {
 		if (isLoading || !settings?.monitoringEnabled) return;
 
-		const rawValue = intervalRef.current?.value;
+		const rawValue = monitoringIntervalRef.current?.value;
 		const newValue = rawValue ? parseInt(rawValue, 10) : NaN;
 
 		if (isNaN(newValue) || newValue <= 0 || newValue === settings.monitoringInterval) return;
 
 		await updateSetting({ monitoringInterval: newValue });
 	};
-	const handleUpdateCpuHistory = async () => {
-		if (isLoading) return;
+	const handleUpdateLiveInterval = async () => {
+		if (isLoading || !settings?.monitoringEnabled) return;
 
-		const rawValue = cpuRef.current?.value;
+		const rawValue = liveFetchingIntervalRef.current?.value;
 		const newValue = rawValue ? parseInt(rawValue, 10) : NaN;
 
-		if (isNaN(newValue) || newValue < 1 || newValue === settings?.cpuHistoryPoints) return;
+		if (isNaN(newValue) || newValue <= 0 || newValue === settings.liveFetchingInterval) return;
 
-		await updateSetting({ cpuHistoryPoints: newValue });
+		await updateSetting({ liveFetchingInterval: newValue });
 	};
-	const handleUpdateNetworkHistory = async () => {
+	const handleUpdateHistoryPoints = async (type: string, ref: React.RefObject<HTMLInputElement | null>, currentValue: number | undefined) => {
 		if (isLoading) return;
-
-		const rawValue = networkRef.current?.value;
+		const rawValue = ref.current?.value;
 		const newValue = rawValue ? parseInt(rawValue, 10) : NaN;
-
-		if (isNaN(newValue) || newValue < 1 || newValue === settings?.networkHistoryPoints) return;
-
-		await updateSetting({ networkHistoryPoints: newValue });
-	};
-	const handleUpdateMemoryHistory = async () => {
-		if (isLoading) return;
-
-		const rawValue = memoryRef.current?.value;
-		const newValue = rawValue ? parseInt(rawValue, 10) : NaN;
-
-		if (isNaN(newValue) || newValue < 1 || newValue === settings?.memoryHistoryPoints) return;
-
-		await updateSetting({ memoryHistoryPoints: newValue });
+		if (isNaN(newValue) || newValue < 1 || newValue === currentValue) return;
+		await updateSetting({ [`${type}HistoryPoints`]: newValue });
 	};
 	const handleUpdateShowHistoryOnLoad = async (checked: boolean) => {
 		if (isLoading) return;
@@ -77,7 +66,7 @@ const SettingsView = ({ isOpen }: DrawerViewProps) => {
 	};
 	// View ---------------------------------------------
 	const monitoring = settings?.monitoringEnabled;
-	const interval = settings?.monitoringInterval;
+	const monitoringInterval = settings?.monitoringInterval;
 	return (
 		<div className="flex flex-col gap-4">
 			<div>
@@ -107,10 +96,37 @@ const SettingsView = ({ isOpen }: DrawerViewProps) => {
 				</button>
 			</div>
 			<div>
+				<div>
+					<label className="block text-gray-600 dark:text-gray-300 mb-1">
+    UI Refresh Interval (ms):
+					</label>
+					<div className="flex gap-2">
+						<input
+							ref={liveFetchingIntervalRef}
+							type="number"
+							className="px-3 py-2 rounded w-full text-sm border disabled:cursor-not-allowed border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 "
+							min={1}
+							disabled={isLoading}
+							placeholder="e.g. 3000"
+						/>
+						<button
+							onClick={handleUpdateLiveInterval}
+							disabled={isLoading}
+							className="px-4 py-2 text-sm font-semibold rounded bg-blue-600 text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-75"
+						>
+      Update
+						</button>
+					</div>
+					{settings?.liveFetchingInterval && (
+						<p className="mt-1 text-sm text-gray-500">
+      Current: <span className="font-mono">{settings.liveFetchingInterval} ms</span>
+						</p>
+					)}
+				</div>
 				<label className="block text-gray-600 dark:text-gray-300 mb-1">Monitoring Interval (ms):</label>
 				<div className="flex gap-2">
 					<input
-						ref={intervalRef}
+						ref={monitoringIntervalRef}
 						type="number"
 						className="px-3 py-2 rounded w-full text-sm border disabled:cursor-not-allowed border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 "
 						min={1}
@@ -125,9 +141,9 @@ const SettingsView = ({ isOpen }: DrawerViewProps) => {
               Update
 					</button>
 				</div>
-				{interval && (
+				{monitoringInterval && (
 					<p className="mt-1 text-sm text-gray-500">
-              Current: <span className="font-mono">{interval} ms</span>
+              Current: <span className="font-mono">{monitoringInterval} ms</span>
 					</p>
 				)}
 			</div>
@@ -143,16 +159,16 @@ const SettingsView = ({ isOpen }: DrawerViewProps) => {
 						placeholder="e.g. 1440"
 					/>
 					<button
-						onClick={handleUpdateCpuHistory}
+						onClick={() => handleUpdateHistoryPoints("cpu", cpuRef, settings?.cpuHistoryPoints)}
 						disabled={isLoading}
 						className="px-4 py-2 text-sm font-semibold rounded bg-blue-600 text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-75"
 					>
             Update
 					</button>
 				</div>
-				{settings?.cpuHistoryPoints && interval && (
+				{settings?.cpuHistoryPoints && monitoringInterval && (
 					<p className="mt-1 text-sm text-gray-500">
-    					Records: <span className="font-mono">{formatDuration(settings.cpuHistoryPoints * interval)}</span>
+    					Records: <span className="font-mono">{formatDuration(settings.cpuHistoryPoints * monitoringInterval)}</span>
 					</p>
 				)}
 			</div>
@@ -168,16 +184,16 @@ const SettingsView = ({ isOpen }: DrawerViewProps) => {
 						placeholder="e.g. 1440"
 					/>
 					<button
-						onClick={handleUpdateNetworkHistory}
+						onClick={() => handleUpdateHistoryPoints("network", networkRef, settings?.networkHistoryPoints)}
 						disabled={isLoading}
 						className="px-4 py-2 text-sm font-semibold rounded bg-blue-600 text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-75"
 					>
             Update
 					</button>
 				</div>
-				{settings?.networkHistoryPoints && interval && (
+				{settings?.networkHistoryPoints && monitoringInterval && (
 					<p className="mt-1 text-sm text-gray-500">
-    					Records: <span className="font-mono">{formatDuration(settings.networkHistoryPoints * interval)}</span>
+    					Records: <span className="font-mono">{formatDuration(settings.networkHistoryPoints * monitoringInterval)}</span>
 					</p>
 				)}
 			</div>
@@ -193,16 +209,16 @@ const SettingsView = ({ isOpen }: DrawerViewProps) => {
 						placeholder="e.g. 1440"
 					/>
 					<button
-						onClick={handleUpdateMemoryHistory}
+						onClick={() => handleUpdateHistoryPoints("memory", memoryRef, settings?.memoryHistoryPoints)}
 						disabled={isLoading}
 						className="px-4 py-2 text-sm font-semibold rounded bg-blue-600 text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-75"
 					>
             Update
 					</button>
 				</div>
-				{settings?.memoryHistoryPoints && interval && (
+				{settings?.memoryHistoryPoints && monitoringInterval && (
 					<p className="mt-1 text-sm text-gray-500">
-    					Records: <span className="font-mono">{formatDuration(settings.memoryHistoryPoints * interval)}</span>
+    					Records: <span className="font-mono">{formatDuration(settings.memoryHistoryPoints * monitoringInterval)}</span>
 					</p>
 				)}
 			</div>

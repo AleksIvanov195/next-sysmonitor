@@ -32,10 +32,11 @@ const StatsView = () => {
 	const [data,,,, reload] = useLoad<SystemData>("/api/dynamic-system-info");
 
 	useEffect(() => {
+		if (!settings?.liveFetchingInterval) return;
 		reload();
-		const interval = setInterval(reload, 10000);
+		const interval = setInterval(reload, settings?.liveFetchingInterval);
 		return () => clearInterval(interval);
-	}, []);
+	}, [settings?.liveFetchingInterval]);
 
 	useEffect(() => {
 		if (data && !selectedDisk && data.disk.length > 0) {

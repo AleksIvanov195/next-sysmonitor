@@ -3,6 +3,7 @@ export interface WatcherError {
 }
 
 export interface AppSettings {
+	liveFetchingInterval: number,
   monitoringEnabled: boolean;
 	autoShowHistory: boolean,
 	monitoringInterval: number;
@@ -12,6 +13,7 @@ export interface AppSettings {
 }
 
 const defaultSettings: AppSettings = {
+	liveFetchingInterval: 10000,
 	monitoringEnabled: false,
 	autoShowHistory: true,
 	monitoringInterval: 60000,
