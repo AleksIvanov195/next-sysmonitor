@@ -26,6 +26,7 @@ export async function getStaticSystemInfo(): Promise<StaticSystemInfo> {
 }
 
 export async function refreshStaticSystemInfo(): Promise<StaticSystemInfo> {
+	cachedStaticInfo = null;
 	const [
 		cpu,
 		memoryModules,
