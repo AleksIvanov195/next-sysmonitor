@@ -1,4 +1,4 @@
-import { getProcessLogs } from "@/lib/pm2logs";
+import { getProcessLogs } from "@/lib/pm2/pm2ProcessLogs";
 import { LogLayout } from "@/app/components/views/logs/LogLayout";
 import { LogSection } from "@/app/components/views/logs/LogSection";
 import { notFound } from "next/navigation";

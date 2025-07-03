@@ -1,7 +1,11 @@
 "use client";
+import { useState } from "react";
+import API from "@/app/components/apiutils/API";
 import { DrawerViewProps } from "../DrawerEntities.types";
 import useLoad from "@/app/components/apiutils/useLoad";
 import ProcessInfoCard from "../../cards/ProcessInfoCard";
+import Link from "next/link";
+import Separator from "@/app/components/UI/Separator";
 
 export interface AppProcess {
     name: string;
@@ -13,28 +17,88 @@ export interface AppProcess {
 const AppProcessesView = ({ isOpen }: DrawerViewProps) => {
 	// Initialisation ---------------------------------------------
 	const [processes,,, isLoading, reloadProcesses] = useLoad<AppProcess[]>("/api/get-app-processes", isOpen);
+	const [isActionLoading, setIsActionLoading] = useState(false);
+	const [isRestarting, setIsRestarting] = useState(false);
 	// State ---------------------------------------------
 	// Handlers ---------------------------------------------
+	const handleClearAllLogs = async () : Promise<void> => {
+		setIsActionLoading(true);
+		const result = await API.post("/api/logs/clear-all");
+		if(!result.isSuccess) alert(`An error occured: ${result.message}`);
+		setIsActionLoading(false);
+	};
+	const handleRestartAll = async () : Promise<void> => {
+		setIsRestarting(true);
+		const myPromise = new Promise((resolve) => {
+			setTimeout(() => {
+				resolve("foo");
+			}, 3000);
+		});
+		await myPromise;
+		setIsRestarting(false);
+	};
+
 	// View ---------------------------------------------
-	if (isLoading) {
-		return <p className="text-center text-gray-400">Loading processes....</p>;
-	}
-	if(!processes) {
-		return <p>No processes found.</p>;
-	}
+	const loading = () => {
+		if(isLoading) {
+			return <p className="text-center text-gray-400">Loading processes....</p>;
+		};
+	};
+	const displayProcesses = () => {
+		if(!processes) {
+			return <p>No processes found.</p>;
+		} else{
+			return (
+				<>
+					{processes.map((process) => (
+						<ProcessInfoCard key = {process.name} process={process} reloadProcesses={reloadProcesses} isRefreshing = {isRestarting}/>
+					))}
+				</>
+			);
+		}
+	};
 	return(
 		<div>
 			<div className="flex justify-between items-center mb-4">
-				<h3 className="text-xl font-semibold text-white">App Processes</h3>
+				<h3 className="text-xl font-semibold text-black dark:text-white">App Processes</h3>
 				<button
 					onClick={reloadProcesses}
 					className="px-3 py-1 text-sm font-semibold rounded bg-white/10 text-white hover:bg-white/20">
 				Refresh
 				</button>
 			</div>
-			{processes.map((process) => (
-				<ProcessInfoCard key = {process.name} process={process} reloadProcesses={reloadProcesses}/>
-			))}
+			<div className="flex flex-wrap gap-2 mb-2">
+				<button
+					onClick={handleRestartAll}
+					disabled={isRestarting}
+					className="flex-1 px-3 py-2 text-xs font-semibold rounded bg-red-500 hover:bg-red-600 text-white disabled:bg-gray-500"
+				>
+					Restart All Processes
+				</button>
+				<button
+					onClick={handleClearAllLogs}
+					disabled={isActionLoading}
+					className="flex-1 px-3 py-2 text-xs font-semibold rounded bg-yellow-600 text-white hover:bg-yellow-700 disabled:bg-gray-500"
+				>
+					Clear All Logs
+				</button>
+				<Link
+					href="/logs/pm2/out"
+					target="_blank"
+					rel="noopener noreferrer"
+					className="flex-1 text-center px-3 py-2 text-xs font-semibold rounded bg-gray-600 text-white hover:bg-gray-700"
+				>
+          PM2 Daemon Logs
+				</Link>
+			</div>
+			<Separator />
+			<div className="mt-4">
+				{isLoading ? (
+					loading()
+				) : (
+					displayProcesses()
+				)}
+			</div>
 		</div>
 	);
 };

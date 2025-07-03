@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { getProcessLogs } from "@/lib/pm2logs";
+import { getProcessLogs } from "@/lib/pm2/pm2ProcessLogs";
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ processName: string; logType: string }> }) {
 	const { processName, logType } = await params;

@@ -5,10 +5,11 @@ import { bytesToGB } from "../../../utils/bytesToGb";
 import API from "../../../apiutils/API";
 import { useState } from "react";
 import { DrawerViewProps } from "../DrawerEntities.types";
+import Separator from "@/app/components/UI/Separator";
 
 const SystemInfoView = ({ isOpen }: DrawerViewProps) => {
 	// Initialisation ---------------------------------------------
-	const [data,,, isLoading, reloadData] = useLoad<StaticSystemInfo>("/api/system-info", isOpen);
+	const [data,, loadingMessage, isLoading, reloadData] = useLoad<StaticSystemInfo>("/api/system-info", isOpen);
 	// State ---------------------------------------------
 	const [isUpdating, setIsUpdating] = useState(false);
 	// Handlers ---------------------------------------------
@@ -20,47 +21,54 @@ const SystemInfoView = ({ isOpen }: DrawerViewProps) => {
 				reloadData();
 			}
 		}finally {
+			reloadData();
 			setIsUpdating(false);
 		}
 	};
-	if (isLoading || isUpdating) {
-		return <p className="text-center text-gray-400">Loading system info....</p>;
-	}
+	const loading = () => {
+		return <p className="text-center text-gray-400">Loading System Info....</p>;
+	};
+	const refreshing = () => {
+		return <p className="text-center text-gray-400">Refreshing system info cache....</p>;
+	};
 	// View ---------------------------------------------
 	const labelClass = "block text-gray-600 dark:text-gray-300 font-semibold mb-1";
 	const valueClass = "text-gray-900 dark:text-gray-100 mb-2";
 	return (
 		<>
-			{data && (
-				<div className="flex flex-col gap-4">
+			<div className="flex flex-col gap-4">
+				<div className="flex justify-between items-center mb-4">
+					<h3 className="text-xl font-semibold text-black dark:text-white">System Information</h3>
 					<button className="px-3 py-1 text-sm font-semibold rounded bg-white/10 text-white hover:bg-white/20" onClick={refreshSystemInfo}>Refresh</button>
-					<div>
+				</div>
+				{isLoading && loading()}
+				{isUpdating && refreshing()}
+				{loadingMessage && <p className="font-bold bg-red-600">{loadingMessage}</p>}
+				{data && (
+					<><div>
 						<div className={labelClass}>CPU</div>
-						<div><span className={labelClass}>Model:</span> <span className={valueClass}>{data.cpu.brand}</span></div>
-						<div><span className={labelClass}>Manufacturer:</span> <span className={valueClass}>{data.cpu.manufacturer}</span></div>
-						<div><span className={labelClass}>Cores:</span> <span className={valueClass}>{data.cpu.cores}</span></div>
-						<div><span className={labelClass}>Speed:</span> <span className={valueClass}>{data.cpu.speed} GHz</span></div>
-						<div><span className={labelClass}>Socket:</span> <span className={valueClass}>{data.cpu.socket}</span></div>
-						<div><span className={labelClass}>Virtualization:</span> <span className={valueClass}>{data.cpu.virtualization ? "Yes" : "No"}</span></div>
+						<span className={labelClass}>Model:</span> <span className={valueClass}>{data.cpu.brand}</span>
+						<span className={labelClass}>Manufacturer:</span> <span className={valueClass}>{data.cpu.manufacturer}</span>
+						<span className={labelClass}>Cores:</span> <span className={valueClass}>{data.cpu.cores}</span>
+						<span className={labelClass}>Speed:</span> <span className={valueClass}>{data.cpu.speed} GHz</span>
+						<span className={labelClass}>Socket:</span> <span className={valueClass}>{data.cpu.socket}</span>
+						<span className={labelClass}>Virtualization:</span> <span className={valueClass}>{data.cpu.virtualization ? "Yes" : "No"}</span>
 					</div>
-					<hr className="border-t border-white" />
-
+					<Separator />
 					<div>
 						<div className={labelClass}>Motherboard</div>
-						<div><span className={labelClass}>Manufacturer:</span> <span className={valueClass}>{data.baseboard.manufacturer}</span></div>
-						<div><span className={labelClass}>Model:</span> <span className={valueClass}>{data.baseboard.model}</span></div>
-						<div><span className={labelClass}>Version:</span> <span className={valueClass}>{data.baseboard.version}</span></div>
+						<span className={labelClass}>Manufacturer:</span> <span className={valueClass}>{data.baseboard.manufacturer}</span>
+						<span className={labelClass}>Model:</span> <span className={valueClass}>{data.baseboard.model}</span>
+						<span className={labelClass}>Version:</span> <span className={valueClass}>{data.baseboard.version}</span>
 					</div>
-					<hr className="border-t border-white" />
-
+					<Separator />
 					<div>
 						<div className={labelClass}>BIOS</div>
-						<div><span className={labelClass}>Vendor:</span> <span className={valueClass}>{data.bios.vendor}</span></div>
-						<div><span className={labelClass}>Version:</span> <span className={valueClass}>{data.bios.version}</span></div>
-						<div><span className={labelClass}>Release Date:</span> <span className={valueClass}>{data.bios.releaseDate}</span></div>
+						<span className={labelClass}>Vendor:</span> <span className={valueClass}>{data.bios.vendor}</span>
+						<span className={labelClass}>Version:</span> <span className={valueClass}>{data.bios.version}</span>
+						<span className={labelClass}>Release Date:</span> <span className={valueClass}>{data.bios.releaseDate}</span>
 					</div>
-					<hr className="border-t border-white" />
-
+					<Separator />
 					<div>
 						<div className={labelClass}>Memory Modules</div>
 						{data.memoryModules.map((mod, i) => (
@@ -71,17 +79,15 @@ const SystemInfoView = ({ isOpen }: DrawerViewProps) => {
 							</div>
 						))}
 					</div>
-					<hr className="border-t border-white" />
-
+					<Separator />
 					<div>
 						<div className={labelClass}>Operating System</div>
-						<div><span className={labelClass}>Distro:</span> <span className={valueClass}>{data.os.distro}</span></div>
-						<div><span className={labelClass}>Release:</span> <span className={valueClass}>{data.os.release}</span></div>
-						<div><span className={labelClass}>Arch:</span> <span className={valueClass}>{data.os.arch}</span></div>
-						<div><span className={labelClass}>Hostname:</span> <span className={valueClass}>{data.os.hostname}</span></div>
+						<span className={labelClass}>Distro:</span> <span className={valueClass}>{data.os.distro}</span>
+						<span className={labelClass}>Release:</span> <span className={valueClass}>{data.os.release}</span>
+						<span className={labelClass}>Arch:</span> <span className={valueClass}>{data.os.arch}</span>
+						<span className={labelClass}>Hostname:</span> <span className={valueClass}>{data.os.hostname}</span>
 					</div>
-					<hr className="border-t border-white" />
-
+					<Separator />
 					<div>
 						<div className={labelClass}>Graphics</div>
 						{data.graphics.controllers.map((gpu, i) => (
@@ -90,8 +96,7 @@ const SystemInfoView = ({ isOpen }: DrawerViewProps) => {
 							</div>
 						))}
 					</div>
-					<hr className="border-t border-white" />
-
+					<Separator />
 					<div>
 						<div className={labelClass}>Disks</div>
 						{data.disks.map((disk, i) => (
@@ -102,7 +107,7 @@ const SystemInfoView = ({ isOpen }: DrawerViewProps) => {
 							</div>
 						))}
 					</div>
-					<hr className="border-t border-white" />
+					<Separator />
 					<div>
 						<div className={labelClass}>Network Interfaces</div>
 						{Array.isArray(data.network) && data.network.map((iface, i) => (
@@ -113,17 +118,18 @@ const SystemInfoView = ({ isOpen }: DrawerViewProps) => {
 							</div>
 						))}
 					</div>
-					<hr className="border-t border-white" />
+					<Separator />
 					<div>
 						<div className={labelClass}>System</div>
-						<div><span className={labelClass}>Manufacturer:</span> <span className={valueClass}>{data.system.manufacturer}</span></div>
-						<div><span className={labelClass}>Model:</span> <span className={valueClass}>{data.system.model}</span></div>
-						<div><span className={labelClass}>Version:</span> <span className={valueClass}>{data.system.version}</span></div>
-						<div><span className={labelClass}>Serial:</span> <span className={valueClass}>{data.system.serial}</span></div>
+						<span className={labelClass}>Manufacturer:</span> <span className={valueClass}>{data.system.manufacturer}</span>
+						<span className={labelClass}>Model:</span> <span className={valueClass}>{data.system.model}</span>
+						<span className={labelClass}>Version:</span> <span className={valueClass}>{data.system.version}</span>
+						<span className={labelClass}>Serial:</span> <span className={valueClass}>{data.system.serial}</span>
 					</div>
-					<hr className="border-t border-white" />
-				</div>
-			)}
+					<Separator />
+					</>
+				)}
+			</div>
 		</>
 	);
 };

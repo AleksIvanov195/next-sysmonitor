@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { AppProcess } from "../drawers/drawer-views/AppProcessesView";
 import API from "../../apiutils/API";
@@ -7,13 +7,17 @@ import API from "../../apiutils/API";
 interface ProcessInfoCard {
 	process: AppProcess;
 	reloadProcesses: () => void;
+	isRefreshing: boolean;
 }
 
-const ProcessInfoCard = ({ process, reloadProcesses }: ProcessInfoCard) => {
+const ProcessInfoCard = ({ process, reloadProcesses, isRefreshing = false }: ProcessInfoCard) => {
 	// Initialisation ---------------------------------------------
 	// State ---------------------------------------------
 	const [isRestarting, setIsRestarting] = useState(false);
 	// Handlers ---------------------------------------------
+	useEffect(() => {
+		setIsRestarting(isRefreshing);
+	}, [isRefreshing]);
 	const handleRestart = async () => {
 		setIsRestarting(true);
 		await API.post("/api/settings-watcher/restart");
@@ -55,7 +59,7 @@ const ProcessInfoCard = ({ process, reloadProcesses }: ProcessInfoCard) => {
 					disabled={isRestarting}
 					className="px-4 p-1.5 text-xs font-semibold rounded bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-wait"
 				>
-					{isRestarting ? "..." : "Restart"}
+					Restart
 				</button>
 				<Link
 					href={`/logs/${process.name}/out`}

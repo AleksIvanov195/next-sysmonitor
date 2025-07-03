@@ -1,11 +1,13 @@
 import { exec } from "child_process";
 import { promisify } from "util";
+import { getPm2Logs } from "./pm2Logs";
 
 const execPromise = promisify(exec);
 
 const allowedProcesses: { [key: string]: string } = {
 	"settings-watcher": "watcher",
 	"sys-monitor-app": "app",
+	"pm2": "pm2",
 };
 
 export async function getProcessLogs(processName: string, logType: "out" | "error"): Promise<string> {
@@ -13,6 +15,9 @@ export async function getProcessLogs(processName: string, logType: "out" | "erro
 
 	if (!pm2Name) {
 		throw new Error(`Process "${processName}" not found in process map.`);
+	}
+	if(pm2Name === "pm2") {
+		return getPm2Logs();
 	}
 
 	const logFlag = logType === "error" ? "err" : "out";
