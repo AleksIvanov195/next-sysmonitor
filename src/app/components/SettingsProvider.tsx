@@ -7,7 +7,7 @@ import API from "./apiutils/API";
 
 interface SettingsContext{
   settings: AppSettings | null;
-	settingsMessage: string;
+	settingsMessage: string | null;
   isLoading: boolean;
 	isUpdating: boolean;
 	isBusy: boolean;

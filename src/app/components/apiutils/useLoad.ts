@@ -3,11 +3,12 @@ import API from "./API";
 
 const useLoad = <T = unknown>(endpoint: string, shouldLoad = true) => {
 	const [data, setData] = useState<T | null>(null);
-	const [loadingMessage, setLoadingMessage] = useState("Loading...");
+	const [loadingMessage, setLoadingMessage] = useState(null);
 	const [isLoading, setIsLoading] = useState(true);
 
 	const loadData = async () => {
 		if (!shouldLoad) return;
+		setLoadingMessage(null);
 		setIsLoading(true);
 		const response = await API.get(endpoint);
 		setIsLoading(false);
