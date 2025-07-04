@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import Switcher from "../../../UI/Switch";
 import { useSettings } from "../../../SettingsProvider";
 import { DrawerViewProps } from "../DrawerEntities.types";
@@ -13,20 +13,22 @@ const SettingsView = ({ isOpen }: DrawerViewProps) => {
 	const { settings, settingsMessage, isLoading, isBusy, reloadSettings, updateSetting } = useSettings();
 	// State ---------------------------------------------
 	useEffect(() => {
-		reloadSettings();
-	}, [isOpen]);
+		if(isOpen) {
+			reloadSettings();
+		}
+	}, [isOpen, reloadSettings]);
 
 	// Handlers ---------------------------------------------
-	const handleSettingUpdate = async (settingUpdate: Partial<AppSettings>) => {
+	const handleSettingUpdate = useCallback(async (settingUpdate: Partial<AppSettings>) => {
 		if (isBusy) return;
 		await updateSetting(settingUpdate);
-	};
-	const calculateDurationForHistoryPoints = (pointsValue: string): string => {
+	}, [isBusy, updateSetting]);
+	const calculateDurationForHistoryPoints = useCallback((pointsValue: string): string => {
 		const points = parseInt(pointsValue, 10) || 0;
 		const interval = settings?.monitoringInterval || 0;
 		const duration = formatDuration(points * interval);
 		return `Records for: ${duration}`;
-	};
+	}, [settings?.monitoringInterval]);
 	// View ---------------------------------------------
 	const monitoring = settings?.monitoringEnabled;
 	return (

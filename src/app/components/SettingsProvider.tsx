@@ -1,5 +1,5 @@
 "use client";
-import { useContext, createContext, ReactNode } from "react";
+import { useContext, createContext, ReactNode, useCallback } from "react";
 import useLoad from "./apiutils/useLoad";
 import { useState } from "react";
 import { AppSettings } from "@/lib/settings/settingsManager";
@@ -23,20 +23,23 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
 
 	const isBusy = isLoading || isUpdating;
 
-	const updateSetting = async (settingData: Partial<AppSettings>) => {
-		if (isUpdating) return;
-		setIsUpdating(true);
-		try {
-			const response = await API.put("/api/edit-setting", settingData);
-			if (response.isSuccess) {
-				// Wait sometime for settings monitor to process
-				await new Promise(resolve => setTimeout(resolve, 500));
+	const updateSetting = useCallback(
+		async (settingData: Partial<AppSettings>) => {
+			if (isUpdating) return;
+			setIsUpdating(true);
+			try {
+				const response = await API.put("/api/edit-setting", settingData);
+				if (response.isSuccess) {
+					// Wait sometime for settings monitor to process
+					await new Promise((resolve) => setTimeout(resolve, 500));
+				}
+				reloadSettings();
+			} finally {
+				setIsUpdating(false);
 			}
-			reloadSettings();
-		} finally {
-			setIsUpdating(false);
-		}
-	};
+		},
+		[isUpdating, reloadSettings],
+	);
 
 	return(
 		<SettingsContext.Provider value={{ settings, settingsMessage, isLoading, isUpdating, isBusy, reloadSettings, updateSetting }}>

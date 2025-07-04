@@ -10,16 +10,19 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 		"settings-watcher": "watcher",
 		"sys-monitor-app": "app",
 	};
-	if(allowedProcesses[processName]) {
-		try {
+	try {
+		if (allowedProcesses[processName]) {
 			const { stderr } = await execPromise(`npm run prod:restart:${allowedProcesses[processName]} --silent`);
 			if (stderr) {
 				return NextResponse.json({ success: false, message: stderr }, { status: 500 });
 			}
 			return NextResponse.json({ success: true });
-		} catch (error) {
-			return NextResponse.json({ success: false, message: error }, { status: 500 });
+		}else{
+			return NextResponse.json({ success: false, message: "Unauthorised" }, { status: 403 });
 		}
+	} catch (error) {
+		return NextResponse.json({ success: false, message: error }, { status: 500 });
 	}
+
 
 }

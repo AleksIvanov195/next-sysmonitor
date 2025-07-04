@@ -1,6 +1,6 @@
 import InputField from "../../UI/InputField";
 import { AppSettings } from "@/lib/settings/settingsManager";
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import formatDuration from "../../utils/formatDuration";
 
 interface SettingsInputFieldProps {
@@ -15,7 +15,7 @@ interface SettingsInputFieldProps {
 }
 
 
-const SettingsInputField = ({ label, type, settingName, currentValue, isLoading, onUpdate, calculateHelpText, warningThreshold } : SettingsInputFieldProps) => {
+const SettingsInputField = memo(({ label, type, settingName, currentValue, isLoading, onUpdate, calculateHelpText, warningThreshold } : SettingsInputFieldProps) => {
 	const [value, setValue] = useState(currentValue?.toString() || "");
 	const [error, setError] = useState("");
 
@@ -80,6 +80,7 @@ const SettingsInputField = ({ label, type, settingName, currentValue, isLoading,
 			)}
 		</div>
 	);
-};
+});
 
+SettingsInputField.displayName = "SettingsInputField";
 export default SettingsInputField;

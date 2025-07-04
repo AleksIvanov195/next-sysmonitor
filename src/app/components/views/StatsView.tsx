@@ -33,10 +33,9 @@ const StatsView = () => {
 
 	useEffect(() => {
 		if (!settings?.liveFetchingInterval) return;
-		reload();
 		const interval = setInterval(reload, settings?.liveFetchingInterval);
 		return () => clearInterval(interval);
-	}, [settings?.liveFetchingInterval]);
+	}, [settings?.liveFetchingInterval, reload]);
 
 	useEffect(() => {
 		if (data && !selectedDisk && data.disk.length > 0) {
