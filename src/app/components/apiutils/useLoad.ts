@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import API from "./API";
 
 const useLoad = <T = unknown>(endpoint: string, shouldLoad = true) => {
@@ -6,7 +6,8 @@ const useLoad = <T = unknown>(endpoint: string, shouldLoad = true) => {
 	const [loadingMessage, setLoadingMessage] = useState(null);
 	const [isLoading, setIsLoading] = useState(true);
 
-	const loadData = async () => {
+
+	const loadData = useCallback(async () => {
 		if (!shouldLoad) return;
 		setLoadingMessage(null);
 		setIsLoading(true);
@@ -18,12 +19,11 @@ const useLoad = <T = unknown>(endpoint: string, shouldLoad = true) => {
 			setData(null);
 			setLoadingMessage(response.message);
 		}
-	};
+	}, [endpoint, shouldLoad]);
 
 	useEffect(() => {
 		loadData();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [endpoint, shouldLoad]);
+	}, [loadData]);
 
 	return [data, setData, loadingMessage, isLoading, loadData] as const;
 };
