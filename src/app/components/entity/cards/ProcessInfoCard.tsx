@@ -18,9 +18,10 @@ const ProcessInfoCard = ({ process, reloadProcesses, isRefreshing = false }: Pro
 	useEffect(() => {
 		setIsRestarting(isRefreshing);
 	}, [isRefreshing]);
+
 	const handleRestart = async () => {
 		setIsRestarting(true);
-		await API.post("/api/settings-watcher/restart");
+		await API.post(`/api/get-app-processes/${process.name}/restart`);
 		reloadProcesses();
 	};
 	// View ---------------------------------------------
