@@ -20,6 +20,16 @@ const ProcessInfoCard = ({ process, reloadProcesses, isRefreshing = false }: Pro
 	}, [isRefreshing]);
 
 	const handleRestart = async () => {
+		if(process.name === "sys-monitor-app") {
+			const confirmed = window.confirm(
+				"WARNING: This will restart the web app.\n\n" +
+  			"If the application fails to come back online, you will need to view the PM2 logs and diagnose the issue. The likely solution would be to manually restart the app.\n\n" +
+  			"Are you sure you want to proceed?",
+			);
+			if (!confirmed) {
+				return;
+			}
+		}
 		setIsRestarting(true);
 		await API.post(`/api/get-app-processes/${process.name}/restart`);
 		reloadProcesses();

@@ -27,17 +27,26 @@ const AppProcessesView = ({ isOpen }: DrawerViewProps) => {
 		if(!result.isSuccess) alert(`An error occured: ${result.message}`);
 		setIsActionLoading(false);
 	};
-	const handleRestartAll = async () : Promise<void> => {
+	const handleRestartAll = async (): Promise<void> => {
+		const confirmed = window.confirm(
+			"WARNING: This will restart the entire application.\n\n" +
+  		"If the application fails to come back online, you will need to view the PM2 logs and diagnose the issue. The likely solution would be to manually restart the app\n\n" +
+  		"Are you sure you want to proceed?",
+		);
+		if (!confirmed) {
+			return;
+		}
 		setIsRestarting(true);
-		const myPromise = new Promise((resolve) => {
-			setTimeout(() => {
-				resolve("foo");
-			}, 3000);
-		});
-		await myPromise;
+		const result = await API.post("/api/get-app-processes/restart-all");
+		if(!result.isSuccess) {
+			// NetworkError will always happen, because the web app itself is down while restarting.
+			if(result.message !== "Error: NetworkError when attempting to fetch resource.") {
+				alert(`An unexpected error occurred: ${result.message}`);
+			}
+		}
+		reloadProcesses();
 		setIsRestarting(false);
 	};
-
 	// View ---------------------------------------------
 	const loading = () => {
 		if(isLoading) {

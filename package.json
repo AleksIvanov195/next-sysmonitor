@@ -17,6 +17,7 @@
     "prod:logs": "pm2 logs",
     "prod:logs:clear": "pm2 flush",
     "prod:delete": "pm2 delete all",
+		"prod:restart:pm2": "pm2 save && pm2 kill && pm2 resurrect",
     "prod:restart:watcher": "pm2 restart settings-watcher",
     "prod:stop:watcher": "pm2 stop settings-watcher",
     "prod:logs:watcher": "pm2 logs settings-watcher --nostream",
