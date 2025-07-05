@@ -72,9 +72,9 @@ const StatsView = () => {
 
 	return (
 		<>
-			<div className="flex flex-col justify-center md:flex-row gap-3 mb-6">
+			<div className="grid grid-cols-1 min-[600px]:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
 				<StatsCard title ={"CPU Utilisation"}
-					bottomText={`temp: ${data.cpuTemp.main}`}
+					bottomText={`temp: ${data.cpuTemp.main}°C `}
 					chart = {
 						<CpuGraph
 							load = {data.currentLoad}

@@ -6,8 +6,8 @@ interface TagSelectorProps {
 
 const TagSelector = ({ tags, selectedTag, onTagClick }: TagSelectorProps) => {
 	return (
-		<div className="w-full overflow-x-auto no-scrollbar">
-			<div className="flex gap-2 justify-center">
+		<div className="w-full text-center overflow-x-auto no-scrollbar">
+			<div className="inline-flex gap-2 whitespace-nowrap">
 				{tags.map(tag => (
 					<span
 						key={tag}
