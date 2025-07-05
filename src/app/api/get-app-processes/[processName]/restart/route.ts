@@ -2,14 +2,11 @@ import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import { exec } from "child_process";
 import { promisify } from "util";
+import allowedProcesses from "@/lib/pm2/allowedProcesses";
 const execPromise = promisify(exec);
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ processName: string }> }) {
 	const { processName } = await params;
-	const allowedProcesses : Record<string, string> = {
-		"settings-watcher": "watcher",
-		"sys-monitor-app": "app",
-	};
 	try {
 		if (allowedProcesses[processName]) {
 			const { stderr } = await execPromise(`npm run prod:restart:${allowedProcesses[processName]} --silent`);

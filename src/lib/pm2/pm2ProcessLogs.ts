@@ -1,14 +1,9 @@
 import { exec } from "child_process";
 import { promisify } from "util";
 import { getPm2Logs } from "./pm2Logs";
+import allowedProcesses from "./allowedProcesses";
 
 const execPromise = promisify(exec);
-
-const allowedProcesses: { [key: string]: string } = {
-	"settings-watcher": "watcher",
-	"sys-monitor-app": "app",
-	"pm2": "pm2",
-};
 
 export async function getProcessLogs(processName: string, logType: "out" | "error"): Promise<string> {
 	const pm2Name = allowedProcesses[processName];
