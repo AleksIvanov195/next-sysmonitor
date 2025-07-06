@@ -16,6 +16,9 @@ const callFetch = async (endpoint: string, method: string, data?: unknown) => {
 		const response = await fetch(endpoint, requestObj);
 		if (response.status === 204) return { isSuccess: true, result: null };
 
+		if (response.status === 401) {
+			window.location.href = "/login";
+		}
 		const result = await response.json().catch(() => null);
 		if (response.ok) {
 			return { isSuccess: true, result };
