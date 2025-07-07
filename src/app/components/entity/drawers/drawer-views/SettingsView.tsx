@@ -7,6 +7,7 @@ import SettingsInputField from "../../form/SettingsInputField";
 import { AppSettings } from "@/lib/settings/settingsManager";
 import formatDuration from "@/app/components/utils/formatDuration";
 import Separator from "@/app/components/UI/Separator";
+import LearnMore from "@/app/components/UI/LearnMore";
 
 const SettingsView = ({ isOpen }: DrawerViewProps) => {
 	// Initialisation ---------------------------------------------
@@ -33,7 +34,10 @@ const SettingsView = ({ isOpen }: DrawerViewProps) => {
 	const monitoring = settings?.monitoringEnabled;
 	return (
 		<div className="flex flex-col gap-4">
-			<h3 className="text-xl font-semibold text-black dark:text-white">Monitoring Settings</h3>
+			<div className="flex items-center gap-2">
+				<h3 className="text-xl font-semibold text-black dark:text-white">Monitoring Settings</h3>
+				<LearnMore href="https://github.com/AleksIvanov195/next-sysmonitor/blob/master/README.md#monitoring-settings" />
+			</div>
 			<div>
 				<span className="mb-2 text-gray-600 dark:text-gray-300">Monitoring status: </span>
 				{isLoading ? (

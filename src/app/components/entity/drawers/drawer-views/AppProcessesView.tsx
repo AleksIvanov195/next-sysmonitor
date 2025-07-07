@@ -6,6 +6,7 @@ import useLoad from "@/app/components/apiutils/useLoad";
 import ProcessInfoCard from "../../cards/ProcessInfoCard";
 import Link from "next/link";
 import Separator from "@/app/components/UI/Separator";
+import LearnMore from "@/app/components/UI/LearnMore";
 
 export interface AppProcess {
     name: string;
@@ -69,7 +70,10 @@ const AppProcessesView = ({ isOpen }: DrawerViewProps) => {
 	return(
 		<div>
 			<div className="flex justify-between items-center mb-4">
-				<h3 className="text-xl font-semibold text-black dark:text-white">App Processes</h3>
+				<div className="flex items-center gap-2">
+					<h3 className="text-xl font-semibold text-black dark:text-white">App Processes</h3>
+				  <LearnMore href="https://github.com/AleksIvanov195/next-sysmonitor/blob/master/README.md#app-processes" />
+				</div>
 				<button
 					onClick={reloadProcesses}
 					className="px-3 py-1 text-sm font-semibold rounded bg-white/10 text-white hover:bg-white/20">

@@ -4,10 +4,11 @@ import SettingsView from "./drawer-views/SettingsView";
 import SystemInfoView from "./drawer-views/SystemInfoView";
 import AppProcessesView from "./drawer-views/AppProcessesView";
 import { ControlDrawerProps } from "./DrawerEntities.types";
+import Icons from "../../UI/Icons";
 const tabs = [
-	{ key: "settings", label: "Settings" },
-	{ key: "processes", label: "App Processes" },
-	{ key: "system-info", label: "System Info" },
+	{ key: "settings", label: "Settings", icon: <Icons.Settings size={25}/> },
+	{ key: "processes", label: "App Processes", icon: <Icons.LayoutList size={25}/> },
+	{ key: "system-info", label: "System Info", icon: <Icons.PcCase size={25}/> },
 ];
 
 const ControlDrawer = ({ isOpen, onClose }: ControlDrawerProps) => {

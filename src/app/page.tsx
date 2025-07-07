@@ -3,6 +3,7 @@ import NavBar from "./components/layout/Navbar";
 import LiveClock from "./components/views/LiveClock";
 import { SettingsProvider } from "./components/SettingsProvider";
 import { logout } from "@/serveractions/logout";
+import Icons from "./components/UI/Icons";
 
 export default function Home() {
 	return (
@@ -19,9 +20,9 @@ export default function Home() {
 						<form action={logout} className="md:absolute right-0">
 							<button
 								type="submit"
-								className="p-2 bg-amber-400"
+								className="p-2 text-white/80 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
 							>
-								out
+								<span title="Logout"><Icons.LogOut/></span>
 							</button>
 						</form>
 					</div>

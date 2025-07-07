@@ -17,17 +17,18 @@ type HistoryTag = "CPU" | "Memory" | "Network";
 
 const HistoryView = ({}) => {
 	// State ---------------------------------------------
-	const [historicData,,,, reloadHistoricData] = useLoad<HistoricData>("/api/historic-system-info");
+	const [historicData,,, isLoading, reloadHistoricData] = useLoad<HistoricData>("/api/historic-system-info");
 	const [selectedTag, setSelectedTag] = useState<HistoryTag>("Network");
 	// Handlers ---------------------------------------------
 	const handleTagClick = (tag: string) => {
 		setSelectedTag(tag as HistoryTag);
 	};
 	// View ---------------------------------------------
-	if (!historicData) {
-		return <div>Loading...</div>;
-	}
+
 	const renderChart = () => {
+		if (!historicData || isLoading) {
+			return <div>Loading...</div>;
+		}
 		if (selectedTag === "Network") {
 			return (
 				<LineChart
@@ -122,6 +123,7 @@ const HistoryView = ({}) => {
 				tags={["Network", "CPU", "Memory"]}
 				onTagClick={handleTagClick}
 				selectedTag={selectedTag}
+				isLoading={!historicData}
 				chart={renderChart()}
 			/>
 		</>

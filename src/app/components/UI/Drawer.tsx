@@ -6,6 +6,7 @@ import { ReactNode } from "react";
 interface Tab {
   key: string;
   label: string;
+	icon?: ReactNode;
 }
 
 interface DrawerProps {
@@ -52,13 +53,14 @@ const Drawer = ({ id, isOpen, onClose, title = "Info", children, tabs, activeTab
 							<button
 								key={tab.key}
 								onClick={() => onTabClick(tab.key)}
+								title={tab.label}
 								className={`p-4 text-left text-base w-full ${
 									activeTab === tab.key
 										? "bg-blue-600 text-white"
 										: "hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
 								}`}
 							>
-								{tab.label}
+								<span className="text-black dark:text-white">{tab.icon ? tab.icon : tab.label}</span>
 							</button>
 					 ))}
 					</div>
@@ -66,8 +68,8 @@ const Drawer = ({ id, isOpen, onClose, title = "Info", children, tabs, activeTab
 				<div
 					id={id}
 					className={`
-          h-screen p-4 overflow-y-auto 
-          bg-white dark:bg-gray-800 w-80`}
+          h-screen p-4 overflow-y-auto
+		  bg-white dark:bg-gray-800 w-80`}
 					aria-labelledby={`${id}-label`}
 				>
 					<h5

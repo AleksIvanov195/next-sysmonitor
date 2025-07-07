@@ -6,6 +6,7 @@ import API from "../../../apiutils/API";
 import { useState } from "react";
 import { DrawerViewProps } from "../DrawerEntities.types";
 import Separator from "@/app/components/UI/Separator";
+import LearnMore from "@/app/components/UI/LearnMore";
 
 const SystemInfoView = ({ isOpen }: DrawerViewProps) => {
 	// Initialisation ---------------------------------------------
@@ -38,7 +39,10 @@ const SystemInfoView = ({ isOpen }: DrawerViewProps) => {
 		<>
 			<div className="flex flex-col gap-4">
 				<div className="flex justify-between items-center mb-4">
-					<h3 className="text-xl font-semibold text-black dark:text-white">System Information</h3>
+					<div className="flex items-center gap-2">
+						<h3 className="text-xl font-semibold text-black dark:text-white">System Info</h3>
+						<LearnMore href="https://github.com/AleksIvanov195/next-sysmonitor/blob/master/README.md#system-information" />
+					</div>
 					<button className="px-3 py-1 text-sm font-semibold rounded bg-white/10 text-white hover:bg-white/20" onClick={refreshSystemInfo}>Refresh</button>
 				</div>
 				{isLoading && loading()}
