@@ -20,15 +20,31 @@ const HistoryView = ({}) => {
 	const [historicData,,, isLoading, reloadHistoricData] = useLoad<HistoricData>("/api/historic-system-info");
 	const [selectedTag, setSelectedTag] = useState<HistoryTag>("Network");
 	// Handlers ---------------------------------------------
-	const handleTagClick = (tag: string) => {
-		setSelectedTag(tag as HistoryTag);
+	const isValidTag = (tag: string): tag is HistoryTag => {
+		return ["CPU", "Memory", "Network"].includes(tag as HistoryTag);
 	};
+	const handleTagClick = (tag: string) => {
+		if (isValidTag(tag)) {
+			setSelectedTag(tag);
+		}
+	};
+
 	// View ---------------------------------------------
 
 	const renderChart = () => {
 		if (!historicData || isLoading) {
 			return <div>Loading...</div>;
 		}
+		const dataMap : Record<HistoryTag, HistoricData[keyof HistoricData]> = {
+			Network: historicData.networkHistory,
+			CPU: historicData.cpuHistory,
+			Memory: historicData.memoryHistory,
+		};
+
+		if (!dataMap[selectedTag] || dataMap[selectedTag].length === 0) {
+			return <div>No {selectedTag.toLowerCase()} data available</div>;
+		}
+
 		if (selectedTag === "Network") {
 			return (
 				<LineChart

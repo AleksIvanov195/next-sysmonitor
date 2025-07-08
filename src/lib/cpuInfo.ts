@@ -45,14 +45,10 @@ export const fetchCpuMetrics = async (): Promise<CpuMetric> => {
 			await new Promise(resolve => setTimeout(resolve, 1000));
 		}
 
-		const [currentLoadRaw, cpuTemp]: [SystemLoad, CpuTemp] = await Promise.all([
+		const [currentLoad, cpuTemp]: [SystemLoad, CpuTemp] = await Promise.all([
 			si.currentLoad(),
 			si.cpuTemperature(),
 		]);
-
-		// Remove the 'cpus' property from currentLoadRaw
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const { cpus, ...currentLoad } = currentLoadRaw;
 
 		const data = {
 			timestamp: Date.now(),

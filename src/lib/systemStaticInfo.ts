@@ -13,7 +13,7 @@ export interface StaticSystemInfo {
   os: Systeminformation.OsData;
   graphics: Systeminformation.GraphicsData;
   disks: DiskFormatted[];
-  network: Systeminformation.NetworkInterfacesData[] | unknown;
+  network: Systeminformation.NetworkInterfacesData[];
   system: Systeminformation.SystemData;
   hostname: string;
 }
@@ -49,6 +49,8 @@ export async function refreshStaticSystemInfo(): Promise<StaticSystemInfo> {
 		si.system(),
 	]);
 
+	const networkArray = Array.isArray(network) ? network : [network];
+
 	cachedStaticInfo = {
 		cpu,
 		baseboard,
@@ -57,7 +59,7 @@ export async function refreshStaticSystemInfo(): Promise<StaticSystemInfo> {
 		os,
 		graphics,
 		disks,
-		network,
+		network: networkArray,
 		system,
 		hostname: os.hostname,
 	};

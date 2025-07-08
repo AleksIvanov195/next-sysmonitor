@@ -1,7 +1,7 @@
 const API = {
 	get: (endpoint: string) => callFetch(endpoint, "GET"),
-	post: (endpoint: string, data?: unknown) => callFetch(endpoint, "POST", data),
-	put: (endpoint: string, data?: unknown) => callFetch(endpoint, "PUT", data),
+	post: <T>(endpoint: string, data?: T) => callFetch(endpoint, "POST", data),
+	put: <T>(endpoint: string, data?: T) => callFetch(endpoint, "PUT", data),
 	delete: (endpoint: string) => callFetch(endpoint, "DELETE"),
 };
 
