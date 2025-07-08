@@ -3,16 +3,24 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { ReactNode } from "react";
 
+interface Tab {
+  key: string;
+  label: string;
+	icon?: ReactNode;
+}
+
 interface DrawerProps {
   id: string;
   isOpen: boolean;
   onClose: () => void;
   title?: string;
   children: ReactNode;
-	showCategory?: boolean;
+	tabs?: Tab[];
+	activeTab?: string;
+  onTabClick?: (key: string) => void;
 }
 
-const Drawer = ({ id, isOpen, onClose, title = "Info", children, showCategory = false }: DrawerProps) => {
+const Drawer = ({ id, isOpen, onClose, title = "Info", children, tabs, activeTab, onTabClick }: DrawerProps) => {
 	// State ---------------------------------------------
 	const [isVisible, setIsVisible] = useState<boolean>(isOpen);
 	const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
@@ -29,7 +37,6 @@ const Drawer = ({ id, isOpen, onClose, title = "Info", children, showCategory = 
 
 	if (!portalRoot) return null;
 
-	// Create drawer content
 	const drawerContent = (
 		<>
 			{isVisible && (
@@ -39,24 +46,30 @@ const Drawer = ({ id, isOpen, onClose, title = "Info", children, showCategory = 
 				/>
 			)}
 			<div className={`fixed flex flex-row z-50 top-0 left-0 transition-transform duration-300 ease-in-out ${isVisible ? "translate-x-0" : "-translate-x-full"}`}>
-				{showCategory &&
-				<div
-					className="h-screen flex flex-col bg-white dark:bg-gray-900 overflow-y-auto border-r border-gray-300 dark:border-gray-700">
-					{["Cat1", "Cat2", "Cat3"].map((tag) => (
-						<button
-							key={tag}
-							className="p-4 hover:bg-gray-200 dark:hover:bg-gray-700 border-b border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-base"
-						>
-							{tag}
-						</button>
-					))}
-				</div>
-				}
+				{tabs && onTabClick && (
+					<div
+						className="h-screen flex flex-col bg-white dark:bg-gray-900 overflow-y-auto border-r border-gray-300 dark:border-gray-700">
+						{tabs.map((tab) => (
+							<button
+								key={tab.key}
+								onClick={() => onTabClick(tab.key)}
+								title={tab.label}
+								className={`p-4 text-left text-base w-full ${
+									activeTab === tab.key
+										? "bg-blue-600 text-white"
+										: "hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+								}`}
+							>
+								<span className="text-black dark:text-white">{tab.icon ? tab.icon : tab.label}</span>
+							</button>
+					 ))}
+					</div>
+				)}
 				<div
 					id={id}
 					className={`
-          h-screen p-4 overflow-y-auto 
-          bg-white dark:bg-gray-800 w-80`}
+          h-screen p-4 overflow-y-auto
+		  bg-white dark:bg-gray-800 w-80`}
 					aria-labelledby={`${id}-label`}
 				>
 					<h5
@@ -83,7 +96,6 @@ const Drawer = ({ id, isOpen, onClose, title = "Info", children, showCategory = 
 					{children}
 				</div>
 			</div>
-
 		</>
 	);
 

@@ -12,6 +12,7 @@ import HistoryView from "./HistoryView";
 import DiskGraph from "../entity/graphs/DiskGraphs";
 import { useSettings } from "../SettingsProvider";
 import useLoad from "../apiutils/useLoad";
+import Icons from "../UI/Icons";
 
 type SystemData = {
   cpu: CpuInfo;
@@ -32,10 +33,10 @@ const StatsView = () => {
 	const [data,,,, reload] = useLoad<SystemData>("/api/dynamic-system-info");
 
 	useEffect(() => {
-		reload();
-		const interval = setInterval(reload, 10000);
+		if (!settings?.liveFetchingInterval) return;
+		const interval = setInterval(reload, settings?.liveFetchingInterval);
 		return () => clearInterval(interval);
-	}, []);
+	}, [settings?.liveFetchingInterval, reload]);
 
 	useEffect(() => {
 		if (data && !selectedDisk && data.disk.length > 0) {
@@ -68,29 +69,28 @@ const StatsView = () => {
 	};
 
 	// View ---------------------------------------------
-	if (!data) return <div>Loading...</div>;
-
 	return (
 		<>
-			<div className="flex flex-col justify-center md:flex-row gap-3 mb-6">
+			<div className="grid grid-cols-1 min-[600px]:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
 				<StatsCard title ={"CPU Utilisation"}
-					bottomText={`temp: ${data.cpuTemp.main}`}
-					chart = {
-						<CpuGraph
-							load = {data.currentLoad}
-						/>}
+					bottomText={data ? `temp: ${data.cpuTemp.main}°C ` : ""}
+					icon={<Icons.Cpu/>}
+					isLoading={!data}
+					chart={data && <CpuGraph load={data.currentLoad} />}
 				/>
-				<StatsCard title ={"Memory Utilisation"}
-					chart = {
-						<MemoryGraph
-							load = {data.memory}
-						/>}
+				<StatsCard
+					title ={"Memory Utilisation"}
+					icon={<Icons.MemoryStick/>}
+					isLoading={!data}
+					chart={data && <MemoryGraph load={data.memory} />}
 				/>
 				<StatsTagCard
 					title={"Disk Usage"}
-					tags={data.disk.map((disk) => disk.name)}
+					tags={data?.disk.map((disk) => disk.name)}
 					onTagClick={handleDiskTagClick}
 					selectedTag={selectedDisk?.name}
+					icon={<Icons.HardDrive/>}
+					isLoading={!data}
 					chart={
 						selectedDisk && (
 							<DiskGraph disk={selectedDisk} />
@@ -101,17 +101,23 @@ const StatsView = () => {
 					tags={["Download", "Upload"]}
 					onTagClick={handleNetworkTagClick}
 					selectedTag={selectedNetworkStat}
-					chart = {
-						<Gauge
-							name="Mbps"
-							value={parseFloat((
-								selectedNetworkStat === "Download"
-									? (data.network?.downloadSpeed * 8) / 1000000
-									: (data.network?.uploadSpeed * 8) / 1000000
-							).toFixed(2))}
-							height={228}
-							width={228}
-						/>}
+					icon={<Icons.ArrowDownUp/>}
+					isLoading={!data}
+					chart={
+						data && (
+							<Gauge
+								name="Mbps"
+								value={parseFloat(
+									(selectedNetworkStat === "Download"
+										? (data.network?.downloadSpeed * 8) / 1000000
+										: (data.network?.uploadSpeed * 8) / 1000000
+									).toFixed(2),
+								)}
+								height={228}
+								width={228}
+							/>
+						)
+					}
 				/>
 			</div>
 			{

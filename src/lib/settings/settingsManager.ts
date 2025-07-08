@@ -3,23 +3,23 @@ export interface WatcherError {
 }
 
 export interface AppSettings {
+	liveFetchingInterval: number,
   monitoringEnabled: boolean;
 	autoShowHistory: boolean,
 	monitoringInterval: number;
 	cpuHistoryPoints: number;
   networkHistoryPoints: number;
   memoryHistoryPoints: number;
-	watcherError: WatcherError;
 }
 
 const defaultSettings: AppSettings = {
+	liveFetchingInterval: 10000,
 	monitoringEnabled: false,
 	autoShowHistory: true,
 	monitoringInterval: 60000,
 	cpuHistoryPoints: 1440,
 	networkHistoryPoints: 1440,
 	memoryHistoryPoints: 1440,
-	watcherError: { error: null },
 };
 
 export const readSettings = async (): Promise<AppSettings> => {

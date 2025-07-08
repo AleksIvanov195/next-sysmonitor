@@ -8,13 +8,37 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "watch": "npx tsx settingsMonitor.js"
+    "watch": "tsx settingsWatcher.js",
+    "prod:start": "npm run build && pm2 start ecosystem.config.cjs",
+    "prod:status": "pm2 status",
+    "prod:processes": "pm2 jlist",
+    "prod:restart": "pm2 restart all",
+    "prod:stop": "pm2 stop all",
+    "prod:logs": "pm2 logs",
+    "prod:logs:clear": "pm2 flush",
+    "prod:delete": "pm2 delete all",
+    "prod:restart:pm2": "pm2 save && pm2 kill && pm2 resurrect",
+    "prod:restart:watcher": "pm2 restart settings-watcher",
+    "prod:stop:watcher": "pm2 stop settings-watcher",
+    "prod:logs:watcher": "pm2 logs settings-watcher --nostream",
+    "prod:logs:watcher:out": "pm2 logs settings-watcher --out --nostream --lines 1000",
+    "prod:logs:watcher:err": "pm2 logs settings-watcher --err --nostream --lines 1000",
+    "prod:describe:watcher": "pm2 describe settings-watcher",
+    "prod:restart:app": "pm2 restart sys-monitor-app",
+    "prod:logs:app:out": "pm2 logs sys-monitor-app --out --nostream --lines 1000",
+    "prod:logs:app:err": "pm2 logs sys-monitor-app --err --nostream --lines 1000",
+    "prod:stop:app": "pm2 stop sys-monitor-app",
+    "prod:logs:app": "pm2 logs sys-monitor-app"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "better-sqlite3": "^11.10.0",
     "echarts": "^5.6.0",
     "echarts-for-react": "^3.0.2",
+    "iron-session": "^8.0.4",
+    "lucide-react": "^0.525.0",
     "next": "15.2.3",
+    "pm2": "^6.0.8",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "systeminformation": "^5.25.11"
@@ -22,6 +46,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/bcrypt": "^5.0.2",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -29,6 +54,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.2.3",
     "tailwindcss": "^4",
+    "tsx": "^4.20.3",
     "typescript": "^5"
   }
 }

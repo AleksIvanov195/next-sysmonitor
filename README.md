@@ -25,8 +25,9 @@ A cross-platform system monitoring application built with Next.js and TypeScript
 1.  Clone the repository.
 2.  Navigate to the project directory.
 3.  Install dependencies: `npm install`
-4.  In a separate terminal, start the backend statistics collector: `npm run watch`
-5.  Start the development server: `npm run dev`
+4.  The app uses PM2. Start the app by running: `npm run prod:start`
+5.	For more commands refer to package.json.
+
 
 ## How to run on Docker
 **Please note: A `Dockerfile` has not been implemented for this project yet.** The commands below outline the planned process for building and running the container once the `Dockerfile` is complete.

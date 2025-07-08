@@ -26,6 +26,7 @@ export const stopMonitoring = async (): Promise<void> => {
 };
 
 export const restartMonitoring = async (interval = 20000): Promise<void> => {
+	console.log("Restarting monitors...");
 	await stopMonitoring();
 	await startMonitoring(interval);
 };

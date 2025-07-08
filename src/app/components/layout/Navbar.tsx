@@ -1,29 +1,25 @@
 "use client";
 import { useState } from "react";
-import SettingsDrawer from "../entity/drawers/SettingsDrawer";
-import SystemInfoDrawer from "../entity/drawers/SystemInfoDrawer";
+import ControlDrawer from "../entity/drawers/ControlDrawer";
+import Icons from "../UI/Icons";
 
 const NavBar = () => {
-	const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-	const [isSystemInfoOpen, setIsSystemInfoOpen] = useState(false);
+	const [isControlDrawerOpen, setIsControlDrawerOpen] = useState(false);
 
 	return (
-		<div className="flex items-center gap-4" >
+		<div className="flex items-center">
 			<button
-				onClick={() => setIsSystemInfoOpen(true)}
-				className="p-2 text-white/80 hover:text-white rounded-lg hover:bg-white/10"
+				onClick={() => setIsControlDrawerOpen(true)}
+				className="p-2 text-white/80 hover:text-white rounded-lg hover:bg-white/10 transition-colors flex items-center gap-2"
+				aria-label="Open control panel"
 			>
-				<span>System Info</span>
+				<div className="text-black dark:text-white">
+					<Icons.Menu/>
+				</div>
+				<span className="hidden md:inline text-base whitespace-nowrap">Control Drawer</span>
 			</button>
-			<button
-				onClick={() => setIsSettingsOpen(true)}
-				className="p-2 text-white/80 hover:text-white rounded-lg hover:bg-white/10"
-			>
-				<span>Settings</span>
-			</button>
-			<SettingsDrawer isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)}/>
-			<SystemInfoDrawer isOpen={isSystemInfoOpen} onClose={() => setIsSystemInfoOpen(false)}/>
 
+			<ControlDrawer isOpen={isControlDrawerOpen} onClose={() => setIsControlDrawerOpen(false)}/>
 		</div>
 	);
 };

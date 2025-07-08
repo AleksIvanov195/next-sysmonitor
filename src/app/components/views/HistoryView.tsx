@@ -17,17 +17,34 @@ type HistoryTag = "CPU" | "Memory" | "Network";
 
 const HistoryView = ({}) => {
 	// State ---------------------------------------------
-	const [historicData,,,, reloadHistoricData] = useLoad<HistoricData>("/api/historic-system-info");
+	const [historicData,,, isLoading, reloadHistoricData] = useLoad<HistoricData>("/api/historic-system-info");
 	const [selectedTag, setSelectedTag] = useState<HistoryTag>("Network");
 	// Handlers ---------------------------------------------
-	const handleTagClick = (tag: string) => {
-		setSelectedTag(tag as HistoryTag);
+	const isValidTag = (tag: string): tag is HistoryTag => {
+		return ["CPU", "Memory", "Network"].includes(tag as HistoryTag);
 	};
+	const handleTagClick = (tag: string) => {
+		if (isValidTag(tag)) {
+			setSelectedTag(tag);
+		}
+	};
+
 	// View ---------------------------------------------
-	if (!historicData) {
-		return <div>Loading...</div>;
-	}
+
 	const renderChart = () => {
+		if (!historicData || isLoading) {
+			return <div>Loading...</div>;
+		}
+		const dataMap : Record<HistoryTag, HistoricData[keyof HistoricData]> = {
+			Network: historicData.networkHistory,
+			CPU: historicData.cpuHistory,
+			Memory: historicData.memoryHistory,
+		};
+
+		if (!dataMap[selectedTag] || dataMap[selectedTag].length === 0) {
+			return <div>No {selectedTag.toLowerCase()} data available</div>;
+		}
+
 		if (selectedTag === "Network") {
 			return (
 				<LineChart
@@ -116,12 +133,13 @@ const HistoryView = ({}) => {
 	};
 	return (
 		<>
-			<button onClick={() => reloadHistoricData()}> RELOAD </button>
+			<button onClick={() => reloadHistoricData()} className="px-3 py-1 text-sm font-semibold rounded bg-white/10 text-white hover:bg-white/20"> RELOAD </button>
 			<StatsTagCard
 				title=""
 				tags={["Network", "CPU", "Memory"]}
 				onTagClick={handleTagClick}
 				selectedTag={selectedTag}
+				isLoading={!historicData}
 				chart={renderChart()}
 			/>
 		</>
