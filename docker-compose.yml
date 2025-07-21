@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  sysmonitor:
+    build: .
+    container_name: sysmonitor
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - SESSION_SECRET=${SESSION_SECRET}
+      - ADMIN_PASSWORD_HASH=${ADMIN_PASSWORD_HASH}
+      - HTTPS_ENABLED=${HTTPS_ENABLED}
+      - PORT=${PORT:-5555}
+    volumes:
+      - /:/host:ro
+      - /dev:/dev:ro
+    network_mode: "host"
