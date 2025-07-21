@@ -12,10 +12,11 @@ export const login = async (prevState: LoginFormState, formData: FormData) : Pro
 	const password = formData.get("password") as string;
 	const session = await getSession();
 
-	const storedHash = process.env.ADMIN_PASSWORD_HASH;
-	if (!storedHash) {
-		return { error: "Application not configured. Please set up a admin password." };
+	const base64Hash = process.env.ADMIN_PASSWORD_HASH;
+	if (!base64Hash) {
+		return { error: "Application not configured. Please set up an admin password." };
 	}
+	const storedHash = Buffer.from(base64Hash, "base64").toString("utf8");
 
 	const isMatch = await bcrypt.compare(password, storedHash);
 	const headersList = await headers();
